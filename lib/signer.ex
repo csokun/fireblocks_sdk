@@ -2,7 +2,8 @@ defmodule FireblocksSdk.Signer do
   use Joken.Config
 
   def signJwt(path, body \\ %{}) do
-    apiKey = UUID.uuid4()
+    apiKey = Application.get_env(:fireblocks_sdk, :apiKey)
+    apiSecret = Application.get_env(:fireblocks_sdk, :apiSecret)
 
     claims = %{
       "uri" => path,
@@ -13,7 +14,7 @@ defmodule FireblocksSdk.Signer do
       "bodyHash" => sha256(body)
     }
 
-    signer = Joken.Signer.parse_config(:rs256)
+    signer = Joken.Signer.create("RS256", %{"pem" => apiSecret})
     Joken.Signer.sign(claims, signer)
   end
 
