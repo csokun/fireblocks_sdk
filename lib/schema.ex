@@ -1,5 +1,5 @@
 defmodule FireblocksSdk.Schema do
-  def paged_vault_accounts_request_filters,
+  def paged_vault_accounts_request_filters(),
     do: [
       namePrefix: [type: :string],
       nameSuffix: [type: :string],
@@ -9,5 +9,11 @@ defmodule FireblocksSdk.Schema do
       limit: [type: :non_neg_integer],
       before: [type: :string],
       after: [type: :string]
+    ]
+
+  def vault_balance_filter(),
+    do: [
+      accountNamePrefix: [type: :string],
+      accountNameSuffic: [type: :string]
     ]
 end
