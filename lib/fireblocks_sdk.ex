@@ -40,7 +40,7 @@ defmodule FireblocksSdk do
     get("/v1/vault/accounts/#{vault_account_id}/#{asset_id}")
   end
 
-  def get_deposit_address(vault_account_id, asset_id) do
+  def get_deposit_addresses(vault_account_id, asset_id) do
     get("/v1/vault/accounts/#{vault_account_id}/#{asset_id}/addresses")
   end
 
@@ -52,6 +52,15 @@ defmodule FireblocksSdk do
   def get_vault_assets_balance(options) do
     {:ok, params} = NimbleOptions.validate(options, Schema.vault_balance_filter())
     get("/v1/vault/assets?#{URI.encode_query(params)}")
+  end
+
+  @doc """
+  Creates a new transaction with the specified options
+
+  Supported options:\n#{NimbleOptions.docs(Schema.transaction_request())}
+  """
+  def create_transaction(transaction, idempotent_key \\ "") do
+    Request.post("/v1/transactions", transaction, idempotent_key)
   end
 
   defp get(path) do
