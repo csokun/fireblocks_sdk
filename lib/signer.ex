@@ -1,7 +1,7 @@
 defmodule FireblocksSdk.Signer do
   use Joken.Config
 
-  def signJwt(path, body \\ %{}) do
+  def sign_jwt(path, body \\ %{}) do
     apiKey = Application.get_env(:fireblocks_sdk, :apiKey)
     apiSecret = Application.get_env(:fireblocks_sdk, :apiSecret)
 

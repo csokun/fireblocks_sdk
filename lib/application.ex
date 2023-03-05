@@ -8,8 +8,7 @@ defmodule FireblocksSdk.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: Tt1.Worker.start_link(arg)
-      # {Tt1.Worker, arg}
+      {Finch, name: FireblocksSdk.Finch}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
