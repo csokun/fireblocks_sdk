@@ -1,6 +1,7 @@
 defmodule FireblocksSdk do
   alias FireblocksSdk.Schema
   alias FireblocksSdk.Request
+  alias FireblocksSdk.Models
 
   @moduledoc """
   Documentation for `FireblocksSdk`.
@@ -9,7 +10,7 @@ defmodule FireblocksSdk do
   @doc """
   Gets all assets that are currently supported by Fireblocks
   """
-  @spec get_supported_assets() :: [FireblocksSdk.Types.asset_type_response()]
+  @spec get_supported_assets() :: [Models.asset_type_response()]
   def get_supported_assets() do
     get("/v1/supported_assets")
   end
@@ -20,7 +21,7 @@ defmodule FireblocksSdk do
   Supported options:\n#{NimbleOptions.docs(Schema.paged_vault_accounts_request_filters())}
   """
   @spec get_vault_accounts_with_page_info(map()) ::
-          FireblocksSdk.Types.paged_vault_accounts_response()
+          Models.paged_vault_accounts_response()
   def get_vault_accounts_with_page_info(options) do
     {:ok, params} = NimbleOptions.validate(options, Schema.paged_vault_accounts_request_filters())
     get("/v1/vault/accounts_paged?#{URI.encode_query(params)}")
@@ -29,7 +30,7 @@ defmodule FireblocksSdk do
   @doc """
   Gets a single vault account
   """
-  @spec get_vault_account_by_id(String.t()) :: FireblocksSdk.Types.vault_account_response()
+  @spec get_vault_account_by_id(String.t()) :: Models.vault_account_response()
   def get_vault_account_by_id(vault_account_id) when is_binary(vault_account_id) do
     get("/v1/vault/accounts/#{vault_account_id}")
   end

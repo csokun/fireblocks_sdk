@@ -25,6 +25,6 @@ defmodule FireblocksSdk.Signer do
 
   defp sha256(content) when is_binary(content) do
     :crypto.hash(:sha256, content)
-    |> Base.encode16()
+    |> Base.encode16(case: :lower)
   end
 end

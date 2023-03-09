@@ -24,12 +24,14 @@ defmodule FireblocksSdk.Request do
     headers =
       case idempotentKey do
         "" -> headers(token)
-        key -> [{"Idempotency-Key", idempotentKey} | headers(token)]
+        key -> [{"Idempotency-Key", key} | headers(token)]
       end
+      |> IO.inspect()
 
     {:ok, response} =
       Finch.build(:post, url, headers, data)
       |> Finch.request(FireblocksSdk.Finch)
+      |> IO.inspect()
 
     response
     |> parse_response()
@@ -42,6 +44,7 @@ defmodule FireblocksSdk.Request do
     [
       {"X-API-Key", api_key},
       {"User-Agent", agent},
+      {"Content-Type", "application/json"},
       {"Authorization", "Bearer #{token}"}
     ]
   end
