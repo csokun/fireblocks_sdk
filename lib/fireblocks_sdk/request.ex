@@ -31,10 +31,39 @@ defmodule FireblocksSdk.Request do
     {:ok, response} =
       Finch.build(:post, url, headers, data)
       |> Finch.request(FireblocksSdk.Finch)
-      |> IO.inspect()
 
     response
     |> parse_response()
+  end
+
+  def atom_to_string(params, props) do
+    atom_transform(params, props, &Atom.to_string/1)
+  end
+
+  def atom_to_upper(params, props) do
+    atom_transform(params, props, fn item ->
+      Atom.to_string(item)
+      |> String.upcase()
+    end)
+  end
+
+  defp atom_transform(params, props, transformer) do
+    props
+    |> Enum.reduce(params, fn prop, acc ->
+      prop =
+        cond do
+          is_atom(prop) -> [prop]
+          is_list(prop) -> prop
+        end
+
+      case get_in(acc, prop) do
+        nil ->
+          acc
+
+        _ ->
+          update_in(acc, prop, &transformer.(&1))
+      end
+    end)
   end
 
   defp headers(token) do

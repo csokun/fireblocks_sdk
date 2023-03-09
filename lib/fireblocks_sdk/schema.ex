@@ -1,4 +1,54 @@
 defmodule FireblocksSdk.Schema do
+  @transaction_status [
+    :submitted,
+    :queued,
+    :pending_signature,
+    :pending_authorization,
+    :pending_3rd_party_manual_approval,
+    :pending_3rd_party,
+    :broadcasting,
+    :confirming,
+    :completed,
+    :pending_aml_screening,
+    :partially_completed,
+    :cancelling,
+    :cancelled,
+    :rejected,
+    :failed,
+    :timeout,
+    :blocked
+  ]
+
+  @transaction_order_by [:createdAt, :lastUpdated]
+
+  @peer_type [
+    :vault_account,
+    :exchange_account,
+    :internal_wallet,
+    :external_wallet,
+    :unknown,
+    :network_connection,
+    :fiat_account,
+    :compound,
+    :one_time_address,
+    :oec_partner
+  ]
+
+  @operation_type [
+    :transfer,
+    :mint,
+    :burn,
+    :supply_to_compound,
+    :redeem_from_compound,
+    :raw,
+    :contract_call,
+    :typed_message
+  ]
+
+  @fee_level [:high, :medium, :low]
+
+  @virtual_type [:off_exchange, :default, :oec_fee_bank]
+
   def paged_vault_accounts_request_filters(),
     do: [
       namePrefix: [type: :string],
@@ -17,28 +67,64 @@ defmodule FireblocksSdk.Schema do
       accountNameSuffic: [type: :string]
     ]
 
-  def transaction_request(),
+  def transaction_filter(),
+    do: [
+      before: [
+        type: :string,
+        doc:
+          "Unix timestamp in milliseconds. Returns only transactions created before the specified date"
+      ],
+      after: [
+        type: :string,
+        doc:
+          "Unix timestamp in milliseconds. Returns only transactions created after the specified date"
+      ],
+      status: [type: {:in, @transaction_status}],
+      orderBy: [type: {:in, @transaction_order_by}],
+      limit: [type: :integer],
+      txHash: [type: :string],
+      assets: [type: :string],
+      sourceType: [type: {:in, @peer_type}],
+      destType: [type: {:in, @peer_type}],
+      sourceId: [type: :string],
+      destId: [type: :string]
+    ]
+
+  def create_transaction_request(),
     do: [
       assetId: [type: :string],
-      # source: [type: :TransferPeerPath],
-      # destination: [type: :DestinationTransferPeerPath],
+      source: [
+        type: :map,
+        keys: [
+          type: [type: {:in, @peer_type}],
+          id: [type: :string],
+          virtualId: [type: :string],
+          virtualType: [type: {:in, @virtual_type}],
+          address: [type: :string]
+        ]
+      ],
+      destination: [
+        type: :map,
+        keys: [
+          type: [type: {:in, @peer_type}],
+          id: [type: :string],
+          virtualId: [type: :string],
+          virtualType: [type: {:in, @virtual_type}],
+          oneTimeAddress: [
+            type: :map,
+            keys: [
+              address: [type: :string],
+              tag: [type: :string]
+            ]
+          ]
+        ]
+      ],
       amount: [type: :string],
       operation: [
-        type:
-          {:in,
-           [
-             :transfer,
-             :mint,
-             :burn,
-             :supply_to_compound,
-             :redeem_from_compound,
-             :raw,
-             :contract_call,
-             :typed_message
-           ]}
+        type: {:in, @operation_type}
       ],
       fee: [type: :string],
-      feeLevel: [type: {:in, [:high, :medium, :low]}],
+      feeLevel: [type: {:in, @fee_level}],
       failOnLowFee: [type: :boolean],
       maxFee: [type: :string],
       priorityFee: [type: :string],
@@ -50,7 +136,7 @@ defmodule FireblocksSdk.Schema do
       autoStaking: [type: :boolean],
       customerRefId: [type: :string],
       extraParameters: [type: :map],
-      # destinations: [type: :TransactionDestination],
+      destinations: [type: :any],
       replaceTxByHash: [type: :string],
       externalTxId: [type: :string],
       treatAsGrossAmount: [type: :boolean],

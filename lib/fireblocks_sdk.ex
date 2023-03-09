@@ -55,15 +55,6 @@ defmodule FireblocksSdk do
     get("/v1/vault/assets?#{URI.encode_query(params)}")
   end
 
-  @doc """
-  Creates a new transaction with the specified options
-
-  Supported options:\n#{NimbleOptions.docs(Schema.transaction_request())}
-  """
-  def create_transaction(transaction, idempotent_key \\ "") do
-    Request.post("/v1/transactions", transaction, idempotent_key)
-  end
-
   defp get(path) do
     [_, data, _] = Request.get(path)
     data
