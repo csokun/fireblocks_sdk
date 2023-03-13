@@ -189,4 +189,34 @@ defmodule FireblocksSdk.Schema do
       maxGasPrice: [type: :string],
       assetId: [type: :string]
     ]
+
+  def vault_create_request(),
+    do: [
+      name: [type: :string, required: true],
+      hiddenOnUI: [type: :boolean, default: false],
+      customerRefId: [type: :string],
+      autoFuel: [type: :boolean, default: true]
+    ]
+
+  def vault_account_filter(),
+    do: [
+      namePrefix: [type: :string],
+      nameSuffix: [type: :string],
+      minAmountThreshold: [type: :non_neg_integer],
+      assetId: [type: :string],
+      maxBip44AddressIndexUsed: [type: :non_neg_integer],
+      maxBip44ChangeAddressIndexUsed: [type: :non_neg_integer]
+    ]
+
+  def vault_set_customer_ref_id_request(),
+    do: [
+      vaultId: [type: :string, required: true],
+      customerRefId: [type: :string, required: true]
+    ]
+
+  def vault_auto_fuel_request(),
+    do: [
+      vaultId: [type: :string, required: true],
+      autoFuel: [type: :boolean, required: true, default: true]
+    ]
 end
