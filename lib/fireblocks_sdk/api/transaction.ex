@@ -1,4 +1,4 @@
-defmodule FireblocksSdk.Api.Transactions do
+defmodule FireblocksSdk.Api.Transaction do
   alias FireblocksSdk.Schema
 
   import FireblocksSdk.Request
