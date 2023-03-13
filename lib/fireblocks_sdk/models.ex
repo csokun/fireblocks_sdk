@@ -1,4 +1,6 @@
 defmodule FireblocksSdk.Models do
+  @moduledoc false
+
   @type asset_type_response :: %{
           id: String.t(),
           name: String.t(),

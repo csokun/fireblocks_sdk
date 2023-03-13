@@ -1,4 +1,6 @@
 defmodule FireblocksSdk.Schema do
+  @moduledoc false
+
   @transaction_status [
     :submitted,
     :queued,

@@ -1,4 +1,5 @@
 defmodule FireblocksSdk.Signer do
+  @moduledoc false
   use Joken.Config
 
   def sign_jwt(path, body \\ %{}) do
