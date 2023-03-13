@@ -22,4 +22,10 @@ defmodule FireblocksSdk do
   def get_users() do
     get!("/v1/users")
   end
+
+  @doc """
+  Get audit logs by day.
+  """
+  def audits(:day), do: get!("/v1/audits?timePeriod=DAY")
+  def audits(:week), do: get!("/v1/audits?timePeriod=WEEK")
 end
