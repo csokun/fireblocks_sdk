@@ -1,6 +1,23 @@
 defmodule FireblocksSdk.Schema do
   @moduledoc false
 
+  @trading_account_type [
+    :coin_futures,
+    :coin_margined_swap,
+    :exchange,
+    :funding,
+    :fundable,
+    :futures,
+    :futures_cross,
+    :margin,
+    :margin_cross,
+    :options,
+    :spot,
+    :usdt_margined_swap_cross,
+    :usdt_futures,
+    :unified
+  ]
+
   @transaction_status [
     :submitted,
     :queued,
@@ -248,5 +265,22 @@ defmodule FireblocksSdk.Schema do
       derivationPath: [type: :string, required: true],
       algorithm: [type: :string, required: true],
       compressed: [type: :boolean]
+    ]
+
+  def exchange_transfer_request(),
+    do: [
+      exchangeId: [type: :string, required: true],
+      asset: [type: :string, required: true],
+      amount: [type: :string, required: true],
+      sourceType: [type: {:in, @trading_account_type}, required: true],
+      destType: [type: {:in, @trading_account_type}, required: true]
+    ]
+
+  def exchange_convert_request(),
+    do: [
+      exchangeId: [type: :string, required: true],
+      amount: [type: :string, required: true],
+      srcAsset: [type: :string, required: true],
+      destAsset: [type: :string, required: true]
     ]
 end
