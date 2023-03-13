@@ -22,27 +22,20 @@ defmodule FireblocksSdk.Request do
   end
 
   def post(path, data, idempotentKey \\ "") do
-    {:ok, token} = Signer.sign_jwt(path, data)
-
-    url = "#{@base_url}#{path}"
-
-    headers =
-      case idempotentKey do
-        "" -> headers(token)
-        key -> [{"Idempotency-Key", key} | headers(token)]
-      end
-      |> IO.inspect()
-
-    {:ok, response} =
-      Finch.build(:post, url, headers, data)
-      |> Finch.request(FireblocksSdk.Finch)
-
-    response
-    |> parse_response()
+    request_with_body(:post, path, data, idempotentKey)
   end
 
   def post!(path, data, idempotentKey \\ "") do
     [_, data, _] = post(path, data, idempotentKey)
+    data
+  end
+
+  def put(path, data, idempotentKey \\ "") do
+    request_with_body(:put, path, data, idempotentKey)
+  end
+
+  def put!(path, data, idempotentKey \\ "") do
+    [_, data, _] = put(path, data, idempotentKey)
     data
   end
 
@@ -86,6 +79,25 @@ defmodule FireblocksSdk.Request do
       {"Content-Type", "application/json"},
       {"Authorization", "Bearer #{token}"}
     ]
+  end
+
+  defp request_with_body(method, path, data, idempotentKey \\ "") do
+    {:ok, token} = Signer.sign_jwt(path, data)
+
+    url = "#{@base_url}#{path}"
+
+    headers =
+      case idempotentKey do
+        "" -> headers(token)
+        key -> [{"Idempotency-Key", key} | headers(token)]
+      end
+
+    {:ok, response} =
+      Finch.build(method, url, headers, data)
+      |> Finch.request(FireblocksSdk.Finch)
+
+    response
+    |> parse_response()
   end
 
   defp parse_response(%Finch.Response{status: status, body: body, headers: headers}) do
