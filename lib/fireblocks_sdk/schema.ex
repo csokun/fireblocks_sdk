@@ -283,4 +283,24 @@ defmodule FireblocksSdk.Schema do
       srcAsset: [type: :string, required: true],
       destAsset: [type: :string, required: true]
     ]
+
+  def wallet_create_request(),
+    do: [
+      name: [type: :string, required: true],
+      customerRefId: [type: :string]
+    ]
+
+  def wallet_set_customer_ref_id_request(),
+    do: [
+      walletId: [type: :string, required: true],
+      customerRefId: [type: :string, required: true]
+    ]
+
+  def wallet_add_asset_request(),
+    do: [
+      walletId: [type: :string, required: true],
+      assetId: [type: :string, required: true],
+      address: [type: :string],
+      tag: [type: :string]
+    ]
 end
