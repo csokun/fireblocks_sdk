@@ -16,6 +16,11 @@ defmodule FireblocksSdk.Request do
     |> parse_response()
   end
 
+  def get!(path) do
+    [_, data, _] = get(path)
+    data
+  end
+
   def post(path, data, idempotentKey \\ "") do
     {:ok, token} = Signer.sign_jwt(path, data)
 
@@ -34,6 +39,11 @@ defmodule FireblocksSdk.Request do
 
     response
     |> parse_response()
+  end
+
+  def post!(path, data, idempotentKey \\ "") do
+    [_, data, _] = post(path, data, idempotentKey)
+    data
   end
 
   def atom_to_string(params, props) do

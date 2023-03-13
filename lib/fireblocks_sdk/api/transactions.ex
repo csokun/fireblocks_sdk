@@ -4,6 +4,15 @@ defmodule FireblocksSdk.Api.Transactions do
   import FireblocksSdk.Request
 
   @doc """
+  Gets the estimated required fee for an asset. For UTXO based assets, the response will contain the suggested fee per byte, for ETH/ETC based assets, the suggested gas price, and for XRP/XLM, the transaction fee.
+
+  - `asset`: The asset for which to estimate the fee
+  """
+  def get_asset_fee(asset) when is_binary(asset) do
+    get!("/v1/transactions?asset=#{asset}")
+  end
+
+  @doc """
   List all transactions
 
   Options: \n#{NimbleOptions.docs(Schema.transaction_filter())}
@@ -17,7 +26,7 @@ defmodule FireblocksSdk.Api.Transactions do
       |> atom_to_string([:orderBy])
       |> URI.encode_query()
 
-    get("/v1/transactions?#{query_string}")
+    get!("/v1/transactions?#{query_string}")
   end
 
   @doc """
@@ -26,27 +35,111 @@ defmodule FireblocksSdk.Api.Transactions do
   Supported options:\n#{NimbleOptions.docs(Schema.create_transaction_request())}
   """
   def create_transaction(transaction, idempotent_key \\ "") do
-    {:ok, options} = NimbleOptions.validate(transaction, Schema.create_transaction_request())
-
-    params =
-      options
-      |> atom_to_upper([
-        [:source, :type],
-        [:source, :virtualType],
-        [:destination, :type],
-        [:destination, :virtualType],
-        [:operation],
-        [:feeLevel]
-      ])
-      |> Enum.into(%{})
-      |> Jason.encode!()
-
-    [_, data, _] = post("/v1/transactions", params, idempotent_key)
-    data
+    params = parse_transaction_creation_request(transaction)
+    post!("/v1/transactions", params, idempotent_key)
   end
 
+  @doc """
+  Estimates the transaction fee for a transaction request.
+
+  Note: Supports all Fireblocks assets except ZCash (ZEC).
+  """
+  def estimate_fee(transaction, idempotent_key \\ "") do
+    params = parse_transaction_creation_request(transaction)
+    post!("/v1/transactions/estimate_fee", params, idempotent_key)
+  end
+
+  @doc """
+  Returns a transaction by ID.
+
+  - `txId`: Fireblocks transaction id
+  """
   def get_transaction_by_id(txId) when is_binary(txId) do
-    [_, data, _] = get("/v1/transactions/#{txId}")
-    data
+    get!("/v1/transactions/#{txId}")
+  end
+
+  @doc """
+  Returns transaction by external transaction ID.
+
+  - `externalTxId`: The external ID of the transaction to return
+  """
+  def get_external_tx_id(exteralTxId) when is_binary(exteralTxId) do
+    get!("/v1/transactions/external_tx_id/#{exteralTxId}/")
+  end
+
+  @doc """
+  Overrides the required number of confirmations for transaction completion by transaction ID.
+
+  Options:\n#{NimbleOptions.docs(Schema.transaction_set_confirmation_request())}
+  """
+  def set_confirmation_threshold(threshold, idempotencyKey \\ "") do
+    {:ok, options} =
+      NimbleOptions.validate(threshold, Schema.transaction_set_confirmation_request())
+
+    id = options[:id]
+
+    endpoint =
+      case options[:type] do
+        :txId -> "/v1/transactions/#{id}/set_confirmation_threshold"
+        :txHash -> "/v1/txHash/#{id}/set_confirmation_threshold"
+      end
+
+    params = %{numOfConfirmations: options[:numOfConfirmations]} |> Jason.encode!()
+    post!(endpoint, params, idempotencyKey)
+  end
+
+  @doc """
+  Drops a stuck ETH transaction and creates a replacement transaction.
+
+  Options: \n#{NimbleOptions.docs(Schema.transaction_drop_request())}
+  """
+  def drop(tx_drop_req, idempotencyKey \\ "") do
+    {:ok, options} = NimbleOptions.validate(tx_drop_req, Schema.transaction_drop_request())
+    params = options |> Jason.encode!()
+    post!("/v1/transactions/#{options[:txId]}/drop", params, idempotencyKey)
+  end
+
+  @doc """
+  Cancels a transaction by ID.
+
+  - `txId`: Fireblocks transaction id
+  """
+  def cancel(txId, idempotencyKey \\ "") when is_binary(txId) do
+    post!("/v1/transactions/#{txId}/cancel", "", idempotencyKey)
+  end
+
+  @doc """
+  Freezes a transaction by ID.
+
+  - `txId`: Fireblocks transaction id
+  """
+  def freeze(txId, idempotencyKey \\ "") when is_binary(txId) do
+    post!("/v1/transactions/#{txId}/freeze", "", idempotencyKey)
+  end
+
+  @doc """
+  Unfreezes a transaction by ID and makes the transaction available again.
+
+  - `txId`: Fireblocks transaction id
+  """
+  def unfreeze(txId, idempotencyKey \\ "") when is_binary(txId) do
+    post!("/v1/transactions/#{txId}/unfreeze", "", idempotencyKey)
+  end
+
+  defp parse_transaction_creation_request(args) do
+    {:ok, options} = NimbleOptions.validate(args, Schema.create_transaction_request())
+
+    options
+    |> atom_to_upper([
+      [:source, :type],
+      [:source, :virtualType],
+      [:destination, :type],
+      [:destination, :virtualType],
+      [:destinations, :destination, :type],
+      [:operation],
+      [:feeLevel]
+    ])
+    |> Enum.into(%{})
+    |> Jason.encode!()
   end
 end

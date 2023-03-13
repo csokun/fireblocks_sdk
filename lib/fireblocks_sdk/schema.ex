@@ -136,7 +136,26 @@ defmodule FireblocksSdk.Schema do
       autoStaking: [type: :boolean],
       customerRefId: [type: :string],
       extraParameters: [type: :map],
-      destinations: [type: :any],
+      destinations: [
+        type: :map,
+        keys: [
+          amount: [type: :string],
+          destination: [
+            type: [type: :map],
+            keys: [
+              type: [type: {:in, @peer_type}],
+              id: [type: :string],
+              oneTimeAddress: [
+                type: :map,
+                keys: [
+                  address: [type: :string],
+                  tag: [type: :string]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
       replaceTxByHash: [type: :string],
       externalTxId: [type: :string],
       treatAsGrossAmount: [type: :boolean],
@@ -147,5 +166,19 @@ defmodule FireblocksSdk.Schema do
           feePayerAccountId: [type: :string]
         ]
       ]
+    ]
+
+  def transaction_drop_request(),
+    do: [
+      txId: [type: :string, required: true],
+      feeLevel: [type: :string],
+      gasFee: [type: :string]
+    ]
+
+  def transaction_set_confirmation_request(),
+    do: [
+      type: [type: {:in, [:txId, :txHash]}],
+      id: [type: :string, doc: "Fireblocks transaction id or blockchain transaction hash"],
+      numOfConfirmations: [type: :integer, default: 0]
     ]
 end
