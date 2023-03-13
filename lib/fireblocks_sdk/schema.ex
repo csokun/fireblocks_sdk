@@ -238,4 +238,15 @@ defmodule FireblocksSdk.Schema do
       addressId: [type: :string, required: true],
       description: [type: :string, default: ""]
     ]
+
+  def vault_public_key_info_filter(),
+    do: [
+      vaultId: [type: :string],
+      assetId: [type: :string],
+      addressId: [type: :string],
+      change: [type: :string],
+      derivationPath: [type: :string, required: true],
+      algorithm: [type: :string, required: true],
+      compressed: [type: :boolean]
+    ]
 end
