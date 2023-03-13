@@ -181,4 +181,12 @@ defmodule FireblocksSdk.Schema do
       id: [type: :string, doc: "Fireblocks transaction id or blockchain transaction hash"],
       numOfConfirmations: [type: :integer, default: 0]
     ]
+
+  def gas_station_settings_request(),
+    do: [
+      gasThreshold: [type: :string, required: true],
+      gasCap: [type: :string, required: true],
+      maxGasPrice: [type: :string],
+      assetId: [type: :string]
+    ]
 end
