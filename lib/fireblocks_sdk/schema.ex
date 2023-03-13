@@ -213,6 +213,8 @@ defmodule FireblocksSdk.Schema do
   def vault_set_customer_ref_id_request(),
     do: [
       vaultId: [type: :string, required: true],
+      assetId: [type: :string],
+      addressId: [type: :string],
       customerRefId: [type: :string, required: true]
     ]
 
@@ -220,5 +222,20 @@ defmodule FireblocksSdk.Schema do
     do: [
       vaultId: [type: :string, required: true],
       autoFuel: [type: :boolean, required: true, default: true]
+    ]
+
+  def vault_create_wallet_request(),
+    do: [
+      vaultId: [type: :string, required: true],
+      assetId: [type: :string, required: true],
+      eosAccountName: [type: :string]
+    ]
+
+  def vault_address_description_request(),
+    do: [
+      vaultId: [type: :string, required: true],
+      assetId: [type: :string, required: true],
+      addressId: [type: :string, required: true],
+      description: [type: :string, default: ""]
     ]
 end

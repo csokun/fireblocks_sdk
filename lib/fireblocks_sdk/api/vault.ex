@@ -51,8 +51,18 @@ defmodule FireblocksSdk.Api.Vault do
   def set_customer_ref_id(reference, idempotentKey \\ "") do
     {:ok, options} = NimbleOptions.validate(reference, Schema.vault_set_customer_ref_id_request())
     vault_id = options[:vaultId]
-    params = options |> Keyword.delete(:vaultId) |> Jason.encode!()
-    post!("/v1/vault/accounts/#{vault_id}/set_customer_ref_id", params, idempotentKey)
+    asset_id = options[:assetId]
+    address_id = options[:addressId]
+    base_path = "/v1/vault/accounts/#{vault_id}"
+
+    path =
+      case asset_id != nil and address_id != nil do
+        true -> "#{base_path}/#{asset_id}/addresses/#{address_id}/set_customer_ref_id"
+        _ -> "#{base_path}/set_customer_ref_id"
+      end
+
+    params = %{customerRefId: options[:customerRefId]} |> Jason.encode!()
+    post!(path, params, idempotentKey)
   end
 
   @doc """
@@ -65,6 +75,66 @@ defmodule FireblocksSdk.Api.Vault do
     vault_id = options[:vaultId]
     params = options |> Keyword.delete(:vaultId) |> Jason.encode!()
     post!("/v1/vault/accounts/#{vault_id}/set_auto_fuel", params, idempotentKey)
+  end
+
+  @doc """
+  Creates a wallet for a specific asset in a vault account.
+  """
+  def create_wallet(wallet, idempotentKey \\ "") do
+    {:ok, options} = NimbleOptions.validate(wallet, Schema.vault_create_wallet_request())
+    vault_id = options[:vaultId]
+    asset_id = options[:assetId]
+
+    params =
+      options
+      |> Keyword.delete(:vaultId)
+      |> Keyword.delete(:assetId)
+      |> Jason.encode!()
+
+    post!("/v1/vault/accounts/#{vault_id}/#{asset_id}", params, idempotentKey)
+  end
+
+  @doc """
+  Updates the balance of a specific asset in a vault account.
+  """
+  def refresh_balance(vault_id, asset_id, idempotentKey \\ "") do
+    post!("/v1/vault/#{vault_id}/#{asset_id}/balance", "", idempotentKey)
+  end
+
+  @doc """
+  Get the maximum amount of a particular asset that can be spent in a single transaction from a specified vault account (UTXO assets only, with a limitation on number of inputs embedded). Send several transactions if you want to spend more than the maximum spendable amount.
+  """
+  def get_utxo_max_spendable_amount(vault_id, asset_id, manual_signing \\ false) do
+    get!(
+      "/v1/vault/accounts/#{vault_id}/#{asset_id}/max_spendable_amount?manualSignging=#{manual_signing}"
+    )
+  end
+
+  @doc """
+  Updates the description of an existing address of an asset in a vault account.
+
+  Options:\n#{NimbleOptions.docs(Schema.vault_address_description_request())}
+  """
+  def update_address_description(address_description, idempotentKey \\ "") do
+    {:ok, options} =
+      NimbleOptions.validate(address_description, Schema.vault_address_description_request())
+
+    vault_id = options[:vaultId]
+    asset_id = options[:assetId]
+    address_id = options[:addressId]
+
+    params =
+      options
+      |> Keyword.delete(:vaultId)
+      |> Keyword.delete(:assetId)
+      |> Keyword.delete(:addressId)
+      |> Jason.encode!()
+
+    post!(
+      "/v1/vault/accounts/#{vault_id}/#{asset_id}/addresses/#{address_id}",
+      params,
+      idempotentKey
+    )
   end
 
   @doc """
