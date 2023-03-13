@@ -141,7 +141,7 @@ defmodule FireblocksSdk.Schema do
         keys: [
           amount: [type: :string],
           destination: [
-            type: [type: :map],
+            type: :map,
             keys: [
               type: [type: {:in, @peer_type}],
               id: [type: :string],
