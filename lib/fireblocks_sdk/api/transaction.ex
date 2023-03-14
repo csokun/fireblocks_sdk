@@ -3,13 +3,15 @@ defmodule FireblocksSdk.Api.Transaction do
 
   import FireblocksSdk.Request
 
+  @base_path "/v1/transactions"
+
   @doc """
   Gets the estimated required fee for an asset. For UTXO based assets, the response will contain the suggested fee per byte, for ETH/ETC based assets, the suggested gas price, and for XRP/XLM, the transaction fee.
 
   - `asset`: The asset for which to estimate the fee
   """
   def get_asset_fee(asset) when is_binary(asset) do
-    get!("/v1/transactions?asset=#{asset}")
+    get!("#{@base_path}?asset=#{asset}")
   end
 
   @doc """
@@ -26,7 +28,7 @@ defmodule FireblocksSdk.Api.Transaction do
       |> atom_to_string([:orderBy])
       |> URI.encode_query()
 
-    get!("/v1/transactions?#{query_string}")
+    get!("#{@base_path}?#{query_string}")
   end
 
   @doc """
@@ -36,7 +38,7 @@ defmodule FireblocksSdk.Api.Transaction do
   """
   def create_transaction(transaction, idempotent_key \\ "") do
     params = parse_transaction_creation_request(transaction)
-    post!("/v1/transactions", params, idempotent_key)
+    post!("#{@base_path}", params, idempotent_key)
   end
 
   @doc """
@@ -46,7 +48,7 @@ defmodule FireblocksSdk.Api.Transaction do
   """
   def estimate_fee(transaction, idempotent_key \\ "") do
     params = parse_transaction_creation_request(transaction)
-    post!("/v1/transactions/estimate_fee", params, idempotent_key)
+    post!("#{@base_path}/estimate_fee", params, idempotent_key)
   end
 
   @doc """
@@ -55,7 +57,7 @@ defmodule FireblocksSdk.Api.Transaction do
   - `txId`: Fireblocks transaction id
   """
   def get_transaction_by_id(txId) when is_binary(txId) do
-    get!("/v1/transactions/#{txId}")
+    get!("#{@base_path}/#{txId}")
   end
 
   @doc """
@@ -64,7 +66,7 @@ defmodule FireblocksSdk.Api.Transaction do
   - `externalTxId`: The external ID of the transaction to return
   """
   def get_external_tx_id(exteralTxId) when is_binary(exteralTxId) do
-    get!("/v1/transactions/external_tx_id/#{exteralTxId}/")
+    get!("#{@base_path}/external_tx_id/#{exteralTxId}/")
   end
 
   @doc """
@@ -80,7 +82,7 @@ defmodule FireblocksSdk.Api.Transaction do
 
     endpoint =
       case options[:type] do
-        :txId -> "/v1/transactions/#{id}/set_confirmation_threshold"
+        :txId -> "#{@base_path}/#{id}/set_confirmation_threshold"
         :txHash -> "/v1/txHash/#{id}/set_confirmation_threshold"
       end
 
@@ -96,7 +98,7 @@ defmodule FireblocksSdk.Api.Transaction do
   def drop(tx_drop_req, idempotencyKey \\ "") do
     {:ok, options} = NimbleOptions.validate(tx_drop_req, Schema.transaction_drop_request())
     params = options |> Jason.encode!()
-    post!("/v1/transactions/#{options[:txId]}/drop", params, idempotencyKey)
+    post!("#{@base_path}/#{options[:txId]}/drop", params, idempotencyKey)
   end
 
   @doc """
@@ -105,7 +107,7 @@ defmodule FireblocksSdk.Api.Transaction do
   - `txId`: Fireblocks transaction id
   """
   def cancel(txId, idempotencyKey \\ "") when is_binary(txId) do
-    post!("/v1/transactions/#{txId}/cancel", "", idempotencyKey)
+    post!("#{@base_path}/#{txId}/cancel", "", idempotencyKey)
   end
 
   @doc """
@@ -114,7 +116,7 @@ defmodule FireblocksSdk.Api.Transaction do
   - `txId`: Fireblocks transaction id
   """
   def freeze(txId, idempotencyKey \\ "") when is_binary(txId) do
-    post!("/v1/transactions/#{txId}/freeze", "", idempotencyKey)
+    post!("#{@base_path}/#{txId}/freeze", "", idempotencyKey)
   end
 
   @doc """
@@ -123,7 +125,7 @@ defmodule FireblocksSdk.Api.Transaction do
   - `txId`: Fireblocks transaction id
   """
   def unfreeze(txId, idempotencyKey \\ "") when is_binary(txId) do
-    post!("/v1/transactions/#{txId}/unfreeze", "", idempotencyKey)
+    post!("#{@base_path}/#{txId}/unfreeze", "", idempotencyKey)
   end
 
   defp parse_transaction_creation_request(args) do
