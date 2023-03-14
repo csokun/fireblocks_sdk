@@ -3,18 +3,18 @@ defmodule FireblocksSdk.Api.GasStation do
 
   import FireblocksSdk.Request
 
+  @base_path "/v1/gas_station"
+
   @doc """
   Returns gas station settings and ETH balance.
   """
-  def get_settings() do
-    get!("/v1/gas_station")
-  end
+  def get_settings(), do: get!(@base_path)
 
   @doc """
   Returns gas station settings and balances for a requested asset.
   """
   def get_settings_by_asset(asset) when is_binary(asset) do
-    get!("/v1/gas_station/#{asset}")
+    get!("#{@base_path}/#{asset}")
   end
 
   @doc """
@@ -27,8 +27,8 @@ defmodule FireblocksSdk.Api.GasStation do
 
     path =
       case options[:assetId] do
-        nil -> "/v1/gas_station/config"
-        asset_id -> "/v1/gas_station/config/#{asset_id}"
+        nil -> "#{@base_path}/config"
+        asset_id -> "#{@base_path}/config/#{asset_id}"
       end
 
     params =
