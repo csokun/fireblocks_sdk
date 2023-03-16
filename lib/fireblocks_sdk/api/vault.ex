@@ -101,7 +101,7 @@ defmodule FireblocksSdk.Api.Vault do
   Updates the balance of a specific asset in a vault account.
   """
   def refresh_balance(vault_id, asset_id, idempotentKey \\ "") do
-    post!("/v1/vault/#{vault_id}/#{asset_id}/balance", "", idempotentKey)
+    post!("#{@accounts_path}/#{vault_id}/#{asset_id}/balance", "", idempotentKey)
   end
 
   @doc """
