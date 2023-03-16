@@ -1,6 +1,6 @@
-# FireblocksSdk
+# Fireblocks SDK
 
-Un-official [Fireblocks API](https://docs.fireblocks.com/api/swagger-ui) Client.
+**Un-official** Elixir [Fireblocks API](https://docs.fireblocks.com/api/swagger-ui) Client.
 
 ## Installation
 
