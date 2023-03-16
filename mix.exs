@@ -33,9 +33,9 @@ defmodule FireblocksSdk.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:finch, "~> 0.14"},
+      {:finch, "~> 0.15"},
       {:joken, "~> 2.5"},
-      {:nimble_options, "~> 0.5"},
+      {:nimble_options, "~> 1.0"},
       {:uuid, "~> 1.1"},
       {:ex_doc, "~> 0.29", only: :dev, runtime: false},
       {:jason, "~> 1.4"}
