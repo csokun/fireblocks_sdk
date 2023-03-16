@@ -20,6 +20,14 @@ defmodule FireblocksSdk.Api.GasStation do
   @doc """
   Configures gas station settings for ETH or given asset.
 
+  ```
+  FireblocksSdk.Api.GasStation.update_settings([
+    assetId: "ETH",
+    gasThreshold: "0.005",
+    gasCap: "0.003"
+  ])
+  ```
+
   Options:\n#{NimbleOptions.docs(Schema.gas_station_settings_request())}
   """
   def update_settings(config, idempotentKey \\ "") do

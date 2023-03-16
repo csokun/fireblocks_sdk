@@ -1,4 +1,5 @@
 defmodule FireblocksSdk.Request do
+  @moduledoc false
   alias FireblocksSdk.Signer
 
   @base_url "https://api.fireblocks.io"

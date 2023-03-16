@@ -2,11 +2,26 @@ defmodule FireblocksSdk do
   import FireblocksSdk.Request
 
   @moduledoc """
-  Documentation for `FireblocksSdk`.
+  Un-official Fireblocks Elixir API Client. For full API spec visit [https://docs.fireblocks.com/api/swagger-ui](https://docs.fireblocks.com/api/swagger-ui).
+
+  ```
+  # config/dev.exs
+  config :fireblocks_sdk,
+    apiKey: "",
+    apiSecret: \"\"\"
+    -----BEGIN RSA PRIVATE KEY-----
+    --api-secret-key-goes-here--
+    -----END RSA PRIVATE KEY-----
+    \"\"\"
+  ```
   """
 
   @doc """
   Gets all assets that are currently supported by Fireblocks
+
+  ```
+  iex> FireblocksSdk.get_supported_assets()
+  ```
   """
   def get_supported_assets(), do: get("/v1/supported_assets")
 
