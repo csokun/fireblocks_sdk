@@ -4,8 +4,7 @@ Un-official [Fireblocks API](https://docs.fireblocks.com/api/swagger-ui) Client.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `fireblocks_sdk` to your list of dependencies in `mix.exs`:
+Adding `fireblocks_sdk` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -13,4 +12,16 @@ def deps do
     {:fireblocks_sdk, "~> 0.1.0"}
   ]
 end
+```
+
+## Config
+
+```elixir
+config :fireblocks_sdk,
+  apiKey: "",
+  apiSecret: """
+  -----BEGIN RSA PRIVATE KEY-----
+  --api-secret-key-goes-here--
+  -----END RSA PRIVATE KEY-----
+  """
 ```
