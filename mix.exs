@@ -14,7 +14,7 @@ defmodule FireblocksSdk.MixProject do
 
       # Hex
       package: package(),
-      description: "Elixir Fireblocks REST Client",
+      description: "Elixir Fireblocks REST API Client",
 
       # Docs
       name: "FireblocksSdk",
@@ -34,7 +34,7 @@ defmodule FireblocksSdk.MixProject do
   defp deps do
     [
       {:finch, "~> 0.15"},
-      {:joken, "~> 2.5"},
+      {:joken, "~> 2.6"},
       {:nimble_options, "~> 1.0"},
       {:uuid, "~> 1.1"},
       {:ex_doc, "~> 0.29", only: :dev, runtime: false},
