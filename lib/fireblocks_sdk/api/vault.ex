@@ -1,13 +1,20 @@
 defmodule FireblocksSdk.Api.Vault do
   alias FireblocksSdk.Schema
   import FireblocksSdk.Request
-  alias FireblocksSdk.Models
 
   @base_path "/v1/vault"
   @accounts_path "/v1/vault/accounts"
 
   @doc """
   Creates a new vault account with the requested name.
+  ```
+  FireblocksSdk.Api.Vault.create([
+    name: "MyVault",
+    hiddenOnUI: false,
+    customerRefId: "MyCustomerRefId",
+    autoFuel: false
+  ])
+  ```
 
   Options:\n#{NimbleOptions.docs(Schema.vault_create_request())}
   """
@@ -49,6 +56,21 @@ defmodule FireblocksSdk.Api.Vault do
   @doc """
   Assigns an AML/KYT customer reference ID for the vault account.
 
+  ```
+  # set customer reference on vault
+  FireblocksSdk.Api.Vault.set_customer_ref_id([
+    vaultId: "1",
+    customerRefId: "Customer#1"
+  ])
+
+  # set customer reference on vault asset
+  FireblocksSdk.Api.Vault.set_customer_ref_id([
+    vaultId: "1",
+    assetId: "ETH",
+    customerRefId: "Customer#1"
+  ])
+  ```
+
   Options:\n#{NimbleOptions.docs(Schema.vault_set_customer_ref_id_request())}
   """
   def set_customer_ref_id(reference, idempotentKey \\ "") do
@@ -82,6 +104,15 @@ defmodule FireblocksSdk.Api.Vault do
 
   @doc """
   Creates a wallet for a specific asset in a vault account.
+
+  ```
+  FireblocksSdk.Api.Vault.create_wallet([
+    vaultId: "1",
+    assetId: "XLM"
+  ])
+  ```
+
+  Options:\n#{NimbleOptions.docs(Schema.vault_create_wallet_request())}
   """
   def create_wallet(wallet, idempotentKey \\ "") do
     {:ok, options} = NimbleOptions.validate(wallet, Schema.vault_create_wallet_request())
@@ -136,6 +167,8 @@ defmodule FireblocksSdk.Api.Vault do
 
   @doc """
   Gets the public key information based on derivation path and signing algorithm.
+
+  Options:\n#{NimbleOptions.docs(Schema.vault_public_key_info_filter())}
   """
   def get_public_key_info(filter) do
     {:ok, options} = NimbleOptions.validate(filter, Schema.vault_public_key_info_filter())
@@ -169,9 +202,8 @@ defmodule FireblocksSdk.Api.Vault do
 
   Options:\n#{NimbleOptions.docs(Schema.vault_address_description_request())}
   """
-  def update_address_description(address_description, idempotentKey \\ "") do
-    {:ok, options} =
-      NimbleOptions.validate(address_description, Schema.vault_address_description_request())
+  def update_address_description(change, idempotentKey \\ "") do
+    {:ok, options} = NimbleOptions.validate(change, Schema.vault_address_description_request())
 
     vault_id = options[:vaultId]
     asset_id = options[:assetId]
@@ -191,20 +223,16 @@ defmodule FireblocksSdk.Api.Vault do
     )
   end
 
-  # @doc """
-  # Gets all vault accounts in your workspace.
-  #
-  # Options:\n#{NimbleOptions.docs(Schema.vault_account_filter())}
-  # """
-  # def get_vault_accounts(filter) do
-  #   {:ok, options} = NimbleOptions.validate(filter, Schema.vault_account_filter())
-  #   query_string = options |> URI.encode_query()
-  #   get!("#{@accounts_path}?#{query_string}")
-  # end
-  #
-
   @doc """
   Gets a list of vault accounts per page matching the given filter or path
+
+  ```
+  FireblocksSdk.Api.Vault.get_vault_accounts_with_page_info([
+    namePrefix: "Operations",
+    assetId: "ETH",
+    limit: 30
+  ])
+  ```
 
   Supported options:\n#{NimbleOptions.docs(Schema.paged_vault_accounts_request_filters())}
   """
@@ -215,14 +243,19 @@ defmodule FireblocksSdk.Api.Vault do
 
   @doc """
   Gets a single vault account
+
+  - `vault_id`: Fireblock vault id
   """
-  @spec get_vault_account_by_id(String.t()) :: Models.vault_account_response()
   def get_vault_account_by_id(vault_id) when is_binary(vault_id) do
     get!("#{@accounts_path}/#{vault_id}")
   end
 
   @doc """
   Get the asset balance for a vault account.
+
+  ```
+  FireblocksSdk.Api.Vault.get_vault_account_asset("1", "XLM")
+  ```
   """
   def get_vault_account_asset(vault_id, asset_id)
       when is_binary(vault_id) and

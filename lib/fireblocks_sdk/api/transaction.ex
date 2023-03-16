@@ -17,6 +17,15 @@ defmodule FireblocksSdk.Api.Transaction do
   @doc """
   List all transactions
 
+  ```
+  FireblocksSdk.Api.Transaction.transactions([
+    status: :rejected, 
+    sourceType: :vault_account,
+    sourceId: "1",
+    limit: 10
+  ])
+  ```
+
   Options: \n#{NimbleOptions.docs(Schema.transaction_filter())}
   """
   def transactions(filter) do
@@ -33,6 +42,23 @@ defmodule FireblocksSdk.Api.Transaction do
 
   @doc """
   Creates a new transaction with the specified options
+
+  ```
+  FireblocksSdk.Api.Transaction.create_transaction([
+    assetId: "ETH",
+    operation: :transfer, # :mint | :burn | :raw
+    source: %{
+      type: :vault_account,
+      id: "1"
+    },
+    destination: %{
+      type: :vault_account,
+      id: "2"
+    },
+    amount: "0.005",
+    note: "donation!"
+  ])
+  ```
 
   Supported options:\n#{NimbleOptions.docs(Schema.create_transaction_request())}
   """

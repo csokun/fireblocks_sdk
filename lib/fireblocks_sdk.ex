@@ -1,6 +1,5 @@
 defmodule FireblocksSdk do
   import FireblocksSdk.Request
-  alias FireblocksSdk.Models
 
   @moduledoc """
   Documentation for `FireblocksSdk`.
@@ -9,7 +8,6 @@ defmodule FireblocksSdk do
   @doc """
   Gets all assets that are currently supported by Fireblocks
   """
-  @spec get_supported_assets() :: [Models.asset_type_response()]
   def get_supported_assets(), do: get("/v1/supported_assets")
 
   @doc """
