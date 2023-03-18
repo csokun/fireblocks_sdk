@@ -4,6 +4,8 @@ defmodule FireblocksSdk.MixProject do
   @version "0.1.0"
   @repo_url "https://github.com/csokun/fireblocks_sdk"
 
+  def getVersion(), do: @version
+
   def project do
     [
       app: :fireblocks_sdk,
