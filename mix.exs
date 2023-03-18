@@ -52,9 +52,14 @@ defmodule FireblocksSdk.MixProject do
 
   defp docs() do
     [
-      main: "FireblocksSdk",
+      main: "README",
       source_ref: "v#{@version}",
-      source_url: @repo_url
+      source_url: @repo_url,
+      extras: [
+        "README.md",
+        "CHANGELOG.md"
+      ],
+      skip_undefined_reference_warnings_on: ["CHANGELOG.md"]
     ]
   end
 end
