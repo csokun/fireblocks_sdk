@@ -6,6 +6,13 @@ defmodule FireblocksSdk.Signer do
     apiKey = Application.get_env(:fireblocks_sdk, :apiKey)
     apiSecret = Application.get_env(:fireblocks_sdk, :apiSecret)
 
+    # support base64 secret
+    secret =
+      case Base.decode64(apiSecret) do
+        {:ok, secret} -> secret
+        _ -> apiSecret
+      end
+
     claims = %{
       "uri" => path,
       "nonce" => UUID.uuid4(),
@@ -15,7 +22,7 @@ defmodule FireblocksSdk.Signer do
       "bodyHash" => sha256(body)
     }
 
-    signer = Joken.Signer.create("RS256", %{"pem" => apiSecret})
+    signer = Joken.Signer.create("RS256", %{"pem" => secret})
     Joken.Signer.sign(claims, signer)
   end
 
