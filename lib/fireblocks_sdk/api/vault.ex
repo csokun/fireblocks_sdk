@@ -42,7 +42,7 @@ defmodule FireblocksSdk.Api.Vault do
   @doc """
   Makes a hidden vault account visible in web console view.
   """
-  def unhide(vault_id, idempotentKey) when is_binary(vault_id) do
+  def unhide(vault_id, idempotentKey \\ "") when is_binary(vault_id) do
     post!("#{@accounts_path}/#{vault_id}/unhide", "", idempotentKey)
   end
 
