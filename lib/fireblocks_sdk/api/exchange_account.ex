@@ -6,22 +6,30 @@ defmodule FireblocksSdk.Api.ExchangeAccount do
 
   @doc """
   List all exchange accounts.
+
+  Options: \n#{NimbleOptions.docs(Schema.exchange_accounts_request())}
   """
-  def get_accounts() do
-    get!(@base_path)
+  def get_accounts(filter) do
+    {:ok, params} = NimbleOptions.validate(filter, Schema.exchange_accounts_request())
+
+    query_string =
+      params
+      |> URI.encode_query()
+
+    get!("#{@base_path}/paged?#{query_string}")
   end
 
   @doc """
   Find a specific exchange account.
   """
-  def get_account(exchangeId) do
+  def get_account(exchangeId) when is_binary(exchangeId) do
     get!("#{@base_path}/#{exchangeId}")
   end
 
   @doc """
   Find an asset for an exchange account.
   """
-  def get_exchange_asset(exchangeId, assetId) do
+  def get_exchange_asset(exchangeId, assetId) when is_binary(exchangeId) and is_binary(assetId) do
     get!("#{@base_path}/#{exchangeId}/#{assetId}")
   end
 
