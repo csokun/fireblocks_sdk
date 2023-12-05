@@ -303,4 +303,21 @@ defmodule FireblocksSdk.Schema do
       address: [type: :string],
       tag: [type: :string]
     ]
+
+  def create_api_user_request(),
+    do: [
+      role: [type: :string, required: true],
+      name: [type: :string, required: true],
+      csrPem: [type: :string, doc: "only for user with signing capability"],
+      coSignerSetupType: [type: :string],
+      coSignerSetupIsFirstUser: [type: :boolean, default: false]
+    ]
+
+  def create_console_user_request(),
+    do: [
+      firstName: [type: :string, required: true],
+      lastName: [type: :string, required: true],
+      role: [type: :string, required: true],
+      email: [type: :string, required: true]
+    ]
 end
