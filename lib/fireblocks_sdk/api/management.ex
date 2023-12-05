@@ -13,6 +13,8 @@ defmodule FireblocksSdk.Api.Management do
 
   @doc """
   Create API User - admin permission is required
+
+  Options: \n#{NimbleOptions.docs(Schema.create_api_user_request())}
   """
   def create_api_user(params) do
     {:ok, params} = NimbleOptions.validate(params, Schema.create_api_user_request())
@@ -28,6 +30,8 @@ defmodule FireblocksSdk.Api.Management do
 
   @doc """
   Create Console User - admin permission is required
+
+  Options: \n#{NimbleOptions.docs(Schema.create_console_user_request())}
   """
   def create_console_user(params) do
     {:ok, params} = NimbleOptions.validate(params, Schema.create_console_user_request())

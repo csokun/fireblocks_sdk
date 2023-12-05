@@ -267,6 +267,13 @@ defmodule FireblocksSdk.Schema do
       compressed: [type: :boolean]
     ]
 
+  def exchange_accounts_request(),
+    do: [
+      before: [type: :string],
+      after: [type: :string],
+      limit: [type: :non_neg_integer, default: 3]
+    ]
+
   def exchange_transfer_request(),
     do: [
       exchangeId: [type: :string, required: true],
