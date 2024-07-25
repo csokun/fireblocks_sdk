@@ -190,7 +190,7 @@ defmodule FireblocksSdk.Schema do
   def transaction_drop_request(),
     do: [
       txId: [type: :string, required: true],
-      feeLevel: [type: :string],
+      feeLevel: [type: {:in, [:high, :medium, :low]}],
       gasFee: [type: :string]
     ]
 

@@ -12,6 +12,13 @@ defmodule FireblocksSdk.Api.GasStation do
 
   @doc """
   Returns gas station settings and balances for a requested asset.
+
+  ```
+  FireblocksSdk.Api.GasStation.get_settings_by_asset("ETH")
+  ```
+
+  Options:
+    - `asset`: `String.t()`
   """
   def get_settings_by_asset(asset) when is_binary(asset) do
     get!("#{@base_path}/#{asset}")

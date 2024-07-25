@@ -36,6 +36,13 @@ defmodule FireblocksSdk.Request do
     data
   end
 
+  @doc """
+  Convert atom to uppercase string.
+  ```
+    FireblocksSdk.Request.atom_to_upper([feeLevel: medium]) 
+    # [feeLevel: "MEDIUM"]
+  ```
+  """
   def atom_to_string(params, props) do
     atom_transform(params, props, &Atom.to_string/1)
   end

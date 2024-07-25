@@ -119,11 +119,24 @@ defmodule FireblocksSdk.Api.Transaction do
   @doc """
   Drops a stuck ETH transaction and creates a replacement transaction.
 
+  ```
+    FireblocksSdk.Api.Transaction.drop([
+      txId: "fireblock-tx-id",
+      feeLevel: :medium,
+      gasFee: ""
+    ])
+  ```
+
   Options: \n#{NimbleOptions.docs(Schema.transaction_drop_request())}
   """
   def drop(tx_drop_req, idempotencyKey \\ "") do
     {:ok, options} = NimbleOptions.validate(tx_drop_req, Schema.transaction_drop_request())
-    params = options |> Jason.encode!()
+
+    params =
+      options
+      |> atom_to_upper([:feeLevel])
+      |> Jason.encode!()
+
     post!("#{@base_path}/#{options[:txId]}/drop", params, idempotencyKey)
   end
 
