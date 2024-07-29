@@ -154,7 +154,7 @@ defmodule FireblocksSdk.Api.Vault do
   """
   def get_utxo_max_spendable_amount(vault_id, asset_id, manual_signing \\ false) do
     get!(
-      "#{@base_path}/#{vault_id}/#{asset_id}/max_spendable_amount?manualSignging=#{manual_signing}"
+      "#{@accounts_path}/#{vault_id}/#{asset_id}/max_spendable_amount?manualSignging=#{manual_signing}"
     )
   end
 
@@ -162,7 +162,7 @@ defmodule FireblocksSdk.Api.Vault do
   Get UTXO unspent input information.
   """
   def get_utxo_unspent_inputs(vault_id, asset_id) do
-    get!("#{@base_path}/#{vault_id}/#{asset_id}/unspent_inputs")
+    get!("#{@accounts_path}/#{vault_id}/#{asset_id}/unspent_inputs")
   end
 
   @doc """
