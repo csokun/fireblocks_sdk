@@ -23,7 +23,7 @@ defmodule FireblocksSdk do
   iex> FireblocksSdk.get_supported_assets()
   ```
   """
-  def get_supported_assets(), do: get("/v1/supported_assets")
+  def get_supported_assets(), do: get!("/v1/supported_assets")
 
   @doc """
   List all users for the workspace.
