@@ -327,4 +327,11 @@ defmodule FireblocksSdk.Schema do
       role: [type: :string, required: true],
       email: [type: :string, required: true]
     ]
+
+  def tokenization_list_request(),
+    do: [
+      pageCursor: [type: :string],
+      pageSize: [type: :non_neg_integer, default: 10],
+      status: [type: :string, default: "COMPLETED"]
+    ]
 end
