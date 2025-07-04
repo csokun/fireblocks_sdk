@@ -334,4 +334,26 @@ defmodule FireblocksSdk.Schema do
       pageSize: [type: :non_neg_integer, default: 10],
       status: [type: :string, default: "COMPLETED"]
     ]
+
+  def tokenization_create_request(),
+    do: [
+      blockchainId: [type: :string],
+      assetId: [type: :string],
+      vaultAccountId: [type: :string, required: true],
+      createParams: [type: :any, required: true],
+      displayName: [type: :string],
+      useGasless: [type: :boolean],
+      fee: [type: :string],
+      feeLevel: [type: :string]
+    ]
+
+  def blockchains_list(),
+    do: [
+      protocol: [type: :string, doc: "The blockchain protocol"],
+      deprecated: [type: :boolean, doc: "Is blockchain deprecated"],
+      test: [type: :boolean, doc: "Is test blockchain"],
+      ids: [type: {:list, :string}, doc: "A list of blockchain IDs (max 100)"],
+      pageCursor: [type: :string, doc: "Page cursor to fetch"],
+      pageSize: [type: :non_neg_integer, doc: "Items per page (max 500)"]
+    ]
 end

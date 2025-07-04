@@ -279,4 +279,8 @@ defmodule FireblocksSdk.Api.Vault do
     {:ok, params} = NimbleOptions.validate(options, Schema.vault_balance_filter())
     get!("#{@base_path}/assets?#{URI.encode_query(params)}")
   end
+
+  def get_asset_wallets(assetId) when is_binary(assetId) do
+    get!("#{@base_path}/asset_wallets?assetId=#{assetId}")
+  end
 end
