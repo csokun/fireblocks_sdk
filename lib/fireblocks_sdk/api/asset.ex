@@ -15,6 +15,17 @@ defmodule FireblocksSdk.Api.Asset do
     price: [type: {:or, [:integer, :float]}, required: true]
   ]
 
+  @list_assets [
+    blockchainId: [type: :string, doc: "Blockchain id of the assets"],
+    assetClass: [type: :string],
+    symbol: [type: :string],
+    scope: [type: {:in, [:global, :local]}],
+    deprecated: [type: :boolean],
+    ids: [type: {:list, :string}, doc: "A list of blockchain IDs (max 100)"],
+    pageCursor: [type: :string, doc: "Page cursor to fetch"],
+    pageSize: [type: :non_neg_integer, doc: "Items per page (max 500)"]
+  ]
+
   @doc """
   Register a new asset to a workspace and return the newly created asset's details. Currently supported chains are:
 
@@ -64,5 +75,32 @@ defmodule FireblocksSdk.Api.Asset do
       |> Jason.encode!()
 
     post!("#{@assets_path}/prices/#{assetId}", params, idempotent_key)
+  end
+
+  @doc """
+  Retrieves all assets supported by Fireblocks in your workspace, providing extended information and enhanced performance compared to the legacy supported_assets endpoint.
+
+  Options: \n#{NimbleOptions.docs(@list_assets)}
+  """
+  def list(opt \\ []) do
+    {:ok, params} = NimbleOptions.validate(opt, @list_assets)
+
+    query_string =
+      params
+      |> atom_to_upper([:scope])
+      |> URI.encode_query()
+      |> case do
+        "" -> ""
+        value -> "?" <> value
+      end
+
+    get!("#{@assets_path}#{query_string}")
+  end
+
+  @doc """
+  Returns an asset by ID or legacyID.
+  """
+  def get(assetId) when is_bitstring(assetId) do
+    get!("#{@assets_path}/#{assetId}")
   end
 end
