@@ -17,7 +17,7 @@ defmodule FireblocksSdk.Api.Asset do
 
   @list_assets [
     blockchainId: [type: :string, doc: "Blockchain id of the assets"],
-    assetClass: [type: :string],
+    assetClass: [type: {:in, [:native, :ft, :fiat, :nft, :sft]}],
     symbol: [type: :string],
     scope: [type: {:in, [:global, :local]}],
     deprecated: [type: :boolean],
@@ -87,7 +87,7 @@ defmodule FireblocksSdk.Api.Asset do
 
     query_string =
       params
-      |> atom_to_upper([:scope])
+      |> atom_to_upper([:assetClass, :scope])
       |> URI.encode_query()
       |> case do
         "" -> ""
