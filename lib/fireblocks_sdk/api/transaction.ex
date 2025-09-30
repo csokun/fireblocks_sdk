@@ -18,8 +18,8 @@ defmodule FireblocksSdk.Api.Transaction do
   List all transactions
 
   ```
-  FireblocksSdk.Api.Transaction.transactions([
-    status: :rejected, 
+  FireblocksSdk.Api.Transaction.list([
+    status: :rejected,
     sourceType: :vault_account,
     sourceId: "1",
     limit: 10
@@ -28,7 +28,7 @@ defmodule FireblocksSdk.Api.Transaction do
 
   Options: \n#{NimbleOptions.docs(Schema.transaction_filter())}
   """
-  def transactions(filter) do
+  def list(filter) do
     {:ok, params} = NimbleOptions.validate(filter, Schema.transaction_filter())
 
     query_string =
@@ -44,7 +44,7 @@ defmodule FireblocksSdk.Api.Transaction do
   Creates a new transaction with the specified options
 
   ```
-  FireblocksSdk.Api.Transaction.create_transaction([
+  FireblocksSdk.Api.Transaction.create([
     assetId: "ETH",
     operation: :transfer, # :mint | :burn | :raw
     source: %{
@@ -62,7 +62,7 @@ defmodule FireblocksSdk.Api.Transaction do
 
   Supported options:\n#{NimbleOptions.docs(Schema.create_transaction_request())}
   """
-  def create_transaction(transaction, idempotent_key \\ "") do
+  def create(transaction, idempotent_key \\ "") do
     params = parse_transaction_creation_request(transaction)
     post!("#{@base_path}", params, idempotent_key)
   end
@@ -82,7 +82,7 @@ defmodule FireblocksSdk.Api.Transaction do
 
   - `txId`: Fireblocks transaction id
   """
-  def get_transaction_by_id(txId) when is_binary(txId) do
+  def get(txId) when is_binary(txId) do
     get!("#{@base_path}/#{txId}")
   end
 
