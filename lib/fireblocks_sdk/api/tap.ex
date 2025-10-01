@@ -1,4 +1,4 @@
-defmodule FireblocksSdk.API.Tap do
+defmodule FireblocksSdk.Api.Tap do
   import FireblocksSdk.Request
 
   @base_path "/v1/tap"
