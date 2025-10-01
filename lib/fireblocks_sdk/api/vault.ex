@@ -49,7 +49,7 @@ defmodule FireblocksSdk.Api.Vault do
   @doc """
   Initiates activation for a wallet in a vault account.
   """
-  def active(vault_id, asset_id, idempotentKey \\ "") do
+  def activate(vault_id, asset_id, idempotentKey \\ "") do
     post!("#{@accounts_path}/#{vault_id}/#{asset_id}/activate", "", idempotentKey)
   end
 
@@ -227,7 +227,7 @@ defmodule FireblocksSdk.Api.Vault do
   Gets a list of vault accounts per page matching the given filter or path
 
   ```
-  FireblocksSdk.Api.Vault.get_vault_accounts_with_page_info([
+  FireblocksSdk.Api.Vault.list([
     namePrefix: "Operations",
     assetId: "ETH",
     limit: 30
@@ -236,7 +236,7 @@ defmodule FireblocksSdk.Api.Vault do
 
   Supported options:\n#{NimbleOptions.docs(Schema.paged_vault_accounts_request_filters())}
   """
-  def get_vault_accounts_with_page_info(options) do
+  def list(options) do
     {:ok, params} = NimbleOptions.validate(options, Schema.paged_vault_accounts_request_filters())
     get!("#{@base_path}/accounts_paged?#{URI.encode_query(params)}")
   end
@@ -246,7 +246,7 @@ defmodule FireblocksSdk.Api.Vault do
 
   - `vault_id`: Fireblock vault id
   """
-  def get_vault_account_by_id(vault_id) when is_binary(vault_id) do
+  def get(vault_id) when is_binary(vault_id) do
     get!("#{@accounts_path}/#{vault_id}")
   end
 
