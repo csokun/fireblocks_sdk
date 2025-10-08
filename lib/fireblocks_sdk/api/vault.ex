@@ -119,13 +119,7 @@ defmodule FireblocksSdk.Api.Vault do
     vault_id = options[:vaultId]
     asset_id = options[:assetId]
 
-    params =
-      options
-      |> Keyword.delete(:vaultId)
-      |> Keyword.delete(:assetId)
-      |> Jason.encode!()
-
-    post!("#{@accounts_path}/#{vault_id}/#{asset_id}", params, idempotentKey)
+    post!("#{@accounts_path}/#{vault_id}/#{asset_id}", "", idempotentKey)
   end
 
   @doc """
