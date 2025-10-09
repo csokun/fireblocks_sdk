@@ -138,16 +138,30 @@ defmodule FireblocksSdk.Schema do
           ]
         ]
       ],
-      amount: [type: :string],
+      amount: [
+        type: :string,
+        doc: "For **TRANSFER** operations, the requested amount to transfer, in the asset’s unit."
+      ],
       operation: [
         type: {:in, @operation_type}
       ],
       fee: [type: :string],
-      feeLevel: [type: {:in, @fee_level}],
+      feeLevel: [
+        type: {:in, @fee_level},
+        doc:
+          "For UTXO or EVM-based blockchains only. Defines the blockchain fee level which will be payed for the transaction. Alternatively, specific fee estimation parameters exist below."
+      ],
       failOnLowFee: [type: :boolean],
       maxFee: [type: :string],
       priorityFee: [type: :string],
-      gasPrice: [type: :string],
+      gasPrice: [
+        type: :string,
+        doc: """
+        For non-EIP-1559, EVM-based transactions. Price per gas unit (in Ethereum this is specified in Gwei).
+
+        **Note:** Only two of the three arguments can be specified in a single transaction: gasLimit, gasPrice and networkFee. Fireblocks recommends using a numeric string for accurate precision. Although a number input exists, it is deprecated.
+        """
+      ],
       gasLimit: [type: :string],
       note: [type: :string],
       cpuStaking: [type: :integer],
@@ -175,16 +189,36 @@ defmodule FireblocksSdk.Schema do
           ]
         ]
       ],
-      replaceTxByHash: [type: :string],
+      replaceTxByHash: [
+        type: :string,
+        doc:
+          "For EVM-based blockchains only. In case a transaction is stuck, specify the hash of the stuck transaction to replace it by this transaction with a higher fee, or to replace it with this transaction with a zero fee and drop it from the blockchain."
+      ],
       externalTxId: [type: :string],
-      treatAsGrossAmount: [type: :boolean],
-      forceSweep: [type: :boolean],
+      treatAsGrossAmount: [
+        type: :boolean,
+        doc: """
+        When set to true, the fee will be deducted from the requested amount.
+
+        **Note:** This parameter can only be considered if a transaction’s asset is a base asset, such as ETH or MATIC. If the asset can’t be used for transaction fees, like USDC, this parameter is ignored and the fee is deducted from the relevant base asset wallet in the source account.
+        """
+      ],
+      forceSweep: [
+        type: :boolean,
+        doc: """
+        For Polkadot, Kusama and Westend transactions only. When set to true, Fireblocks will empty the asset wallet.
+
+        **Note:** If set to true when the source account is exactly 1 DOT, the transaction will fail. Any amount more or less than 1 DOT succeeds. This is a Polkadot blockchain limitation.
+        """
+      ],
       feePayerInfo: [
         type: :map,
         keys: [
           feePayerAccountId: [type: :string]
         ]
-      ]
+      ],
+      travelRuleMessageId: [type: :string],
+      useGasless: [type: :boolean]
     ]
 
   def transaction_drop_request(),
