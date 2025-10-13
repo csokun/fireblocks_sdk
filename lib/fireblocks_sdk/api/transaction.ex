@@ -33,7 +33,7 @@ defmodule FireblocksSdk.Api.Transaction do
 
     query_string =
       params
-      |> atom_to_upper([:status, :sourceType, :destType])
+      |> atom_to_upper([:status, :sourceType, :destType, :sort])
       |> atom_to_string([:orderBy])
       |> URI.encode_query()
 

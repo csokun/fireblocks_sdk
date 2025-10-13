@@ -100,9 +100,14 @@ defmodule FireblocksSdk.Schema do
       ],
       status: [type: {:in, @transaction_status}],
       orderBy: [type: {:in, @transaction_order_by}],
-      limit: [type: :integer],
+      sort: [type: {:in, [:asc, :desc]}],
+      limit: [
+        type: :integer,
+        doc:
+          "Limits the number of results. If not provided, a limit of 200 will be used. The maximum allowed limit is 500"
+      ],
       txHash: [type: :string],
-      assets: [type: :string],
+      assets: [type: :string, doc: "A list of assets to filter by, seperated by commas"],
       sourceType: [type: {:in, @peer_type}],
       destType: [type: {:in, @peer_type}],
       sourceId: [type: :string],
