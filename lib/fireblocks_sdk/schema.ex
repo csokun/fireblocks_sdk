@@ -1,6 +1,26 @@
 defmodule FireblocksSdk.Schema do
   @moduledoc false
 
+  @pagination [
+    orderBy: [type: {:in, [:asc, :desc]}],
+    limit: [
+      type: :non_neg_integer,
+      default: 200,
+      doc:
+        "The maximum number of asset wallets in a single response. The default is 200 and the maximum is 1000."
+    ],
+    before: [
+      type: :string,
+      doc:
+        "Fetches the next paginated response before this element. This element is a cursor and is returned at the response of the previous page."
+    ],
+    after: [
+      type: :string,
+      doc:
+        "Fetches the next paginated response after this element. This element is a cursor and is returned at the response of the previous page."
+    ]
+  ]
+
   @trading_account_type [
     :coin_futures,
     :coin_margined_swap,
@@ -69,22 +89,34 @@ defmodule FireblocksSdk.Schema do
   @virtual_type [:off_exchange, :default, :oec_fee_bank]
 
   def paged_vault_accounts_request_filters(),
-    do: [
-      namePrefix: [type: :string],
-      nameSuffix: [type: :string],
-      minAmountThreshold: [type: :non_neg_integer],
-      assetId: [type: :string],
-      orderBy: [type: {:in, [:asc, :desc]}],
-      limit: [type: :non_neg_integer],
-      before: [type: :string],
-      after: [type: :string]
-    ]
+    do:
+      [
+        namePrefix: [type: :string],
+        nameSuffix: [type: :string],
+        minAmountThreshold: [type: :non_neg_integer],
+        assetId: [type: :string]
+      ] ++ @pagination
 
   def vault_balance_filter(),
     do: [
       accountNamePrefix: [type: :string],
       accountNameSuffic: [type: :string]
     ]
+
+  def vault_asset_wallets(),
+    do:
+      [
+        totalAmountLargerThan: [
+          type: {:or, [:non_neg_integer, :float]},
+          doc:
+            "When specified, only asset wallets with total balance larger than this amount are returned."
+        ],
+        assetId: [
+          type: :string,
+          doc:
+            "When specified, only asset wallets cross vault accounts that have this asset ID are returned."
+        ]
+      ] ++ @pagination
 
   def transaction_filter(),
     do: [

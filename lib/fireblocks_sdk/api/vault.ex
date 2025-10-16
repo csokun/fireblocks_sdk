@@ -248,10 +248,10 @@ defmodule FireblocksSdk.Api.Vault do
   Get the asset balance for a vault account.
 
   ```
-  FireblocksSdk.Api.Vault.get_vault_account_asset("1", "XLM")
+  FireblocksSdk.Api.Vault.get_asset_balance("1", "XLM")
   ```
   """
-  def get_vault_account_asset(vault_id, asset_id)
+  def get_asset_balance(vault_id, asset_id)
       when is_binary(vault_id) and
              is_binary(asset_id) do
     get!("#{@accounts_path}/#{vault_id}/#{asset_id}")
@@ -267,14 +267,34 @@ defmodule FireblocksSdk.Api.Vault do
   @doc """
   Gets the assets amount summary for all accounts or filtered accounts.
 
+  ```
+  FireblocksSdk.Api.Vault.get_assets_balance([
+    accountNamePrefix: "Operation"
+  ])
+  ```
+
   Supported options:\n#{NimbleOptions.docs(Schema.vault_balance_filter())}
   """
-  def get_vault_assets_balance(options) do
+  def get_assets_balance(options) do
     {:ok, params} = NimbleOptions.validate(options, Schema.vault_balance_filter())
     get!("#{@base_path}/assets?#{URI.encode_query(params)}")
   end
 
-  def get_asset_wallets(assetId) when is_binary(assetId) do
-    get!("#{@base_path}/asset_wallets?assetId=#{assetId}")
+  @doc """
+  Gets all asset wallets at all of the vault accounts in your workspace. An asset wallet is an asset at a vault account. This method allows fast traversal of all account balances.
+
+  ```
+  FireblocksSdk.Api.Vault.get_asset_wallets([
+    totalAmountLargerThan: 0,
+    assetId: "USDC",
+    limit: 1
+  ])
+  ```
+
+  Supported options:\n#{NimbleOptions.docs(Schema.vault_asset_wallets())}
+  """
+  def get_asset_wallets(options) do
+    {:ok, params} = NimbleOptions.validate(options, Schema.vault_asset_wallets())
+    get!("#{@base_path}/asset_wallets?#{URI.encode_query(params)}")
   end
 end
