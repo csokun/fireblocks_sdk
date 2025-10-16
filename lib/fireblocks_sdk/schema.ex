@@ -138,12 +138,20 @@ defmodule FireblocksSdk.Schema do
         doc:
           "Limits the number of results. If not provided, a limit of 200 will be used. The maximum allowed limit is 500"
       ],
-      txHash: [type: :string],
+      txHash: [type: :string, doc: "Returns only results with a specified txHash"],
       assets: [type: :string, doc: "A list of assets to filter by, seperated by commas"],
       sourceType: [type: {:in, @peer_type}],
       destType: [type: {:in, @peer_type}],
       sourceId: [type: :string],
-      destId: [type: :string]
+      destId: [type: :string, doc: "The destination ID of the transaction"],
+      sourceWalletId: [
+        type: :string,
+        doc: "Returns only results where the source is a specific end user wallet"
+      ],
+      destWalletId: [
+        type: :string,
+        doc: "Returns only results where the destination is a specific end user wallet"
+      ]
     ]
 
   def create_transaction_request(),
