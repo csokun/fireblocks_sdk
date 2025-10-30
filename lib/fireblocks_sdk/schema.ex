@@ -435,4 +435,91 @@ defmodule FireblocksSdk.Schema do
       pageCursor: [type: :string, doc: "Page cursor to fetch"],
       pageSize: [type: :non_neg_integer, doc: "Items per page (max 500)"]
     ]
+
+  def staking_stake_request(),
+    do: [
+      vaultAccountId: [
+        type: :string,
+        required: true,
+        doc: "The source vault account to stake from"
+      ],
+      chainDescriptor: [type: :string, required: true],
+      providerId: [
+        type: :string,
+        required: true,
+        doc: "The unique identifier of the staking provider"
+      ],
+      stakeAmount: [type: :string, required: true, doc: "Amount of tokens to stake"],
+      fee: [type: :string],
+      feeLevel: [type: {:in, @fee_level}],
+      txNote: [type: :string, required: false]
+    ]
+
+  def staking_unstake_request(),
+    do: [
+      id: [type: :string, required: true, doc: "id of position to unstake"],
+      chainDescriptor: [type: :string, required: true],
+      fee: [type: :string],
+      feeLevel: [type: {:in, @fee_level}],
+      txNote: [type: :string, required: false],
+      amount: [
+        type: :string,
+        doc:
+          "The number of tokens to unstake. This optional field is applicable only for liquid staking and allows for a partial unstake of the position. If not provided, the entire position will be unstaked by default."
+      ]
+    ]
+
+  def staking_withdraw_request(),
+    do: [
+      id: [type: :string, required: true, doc: "id of position to unstake"],
+      chainDescriptor: [type: :string, required: true],
+      fee: [type: :string],
+      feeLevel: [type: {:in, @fee_level}],
+      txNote: [type: :string, required: false]
+    ]
+
+  def staking_claim_rewards_request(),
+    do: [
+      id: [type: :string, required: true, doc: "id of position to unstake"],
+      chainDescriptor: [type: :string, required: true],
+      fee: [type: :string],
+      feeLevel: [type: {:in, @fee_level}],
+      txNote: [type: :string, required: false]
+    ]
+
+  def staking_split_request(),
+    do: [
+      id: [type: :string, required: true, doc: "id of position to unstake"],
+      chainDescriptor: [type: {:in, ["SOL", "SOL_TEST"]}, required: true],
+      fee: [type: :string],
+      feeLevel: [type: {:in, @fee_level}],
+      txNote: [
+        type: :string,
+        required: false,
+        doc: "The note to associate with the transactions."
+      ],
+      amount: [
+        type: :string,
+        required: true,
+        doc: "Amount of tokens to be transferred to the new stake account."
+      ]
+    ]
+
+  def staking_merge_request(),
+    do: [
+      chainDescriptor: [type: {:in, ["SOL", "SOL_TEST"]}, required: true],
+      sourceId: [type: :string, required: true, doc: "Id of the source position to merge from"],
+      destinationId: [
+        type: :string,
+        required: true,
+        doc: "Id of the destination position to merge into"
+      ],
+      fee: [type: :string],
+      feeLevel: [type: {:in, @fee_level}],
+      txNote: [
+        type: :string,
+        required: false,
+        doc: "The note to associate with the transactions."
+      ]
+    ]
 end
