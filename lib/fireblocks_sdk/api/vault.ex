@@ -286,7 +286,7 @@ defmodule FireblocksSdk.Api.Vault do
       params
       |> Keyword.delete(:vaultAccountId)
       |> Keyword.delete(:assetId)
-      |> Jason.encode!()
+      |> URI.encode_query()
 
     get!("#{@accounts_path}/#{vaultId}/#{assetId}/addresses_paginated?#{query_string}")
   end

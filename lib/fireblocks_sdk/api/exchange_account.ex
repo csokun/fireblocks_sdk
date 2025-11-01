@@ -38,7 +38,7 @@ defmodule FireblocksSdk.Api.ExchangeAccount do
 
   Options:\n#{NimbleOptions.docs(Schema.exchange_transfer_request())}
   """
-  def transfer(trade, idempotentKey \\ "") do
+  def internal_transfer(trade, idempotentKey \\ "") do
     {:ok, options} = NimbleOptions.validate(trade, Schema.exchange_transfer_request())
     exchangeId = options[:exchangeId]
     data = options |> Keyword.delete(:exchangeId) |> Jason.encode!()
@@ -55,5 +55,19 @@ defmodule FireblocksSdk.Api.ExchangeAccount do
     exchangeId = options[:exchangeId]
     data = options |> Keyword.delete(:exchangeId) |> Jason.encode!()
     post!("#{@base_path}/#{exchangeId}/convert", data, idempotentKey)
+  end
+
+  @doc """
+  Find an asset in an exchange account
+  """
+  def get_asset(exchange_id, asset_id) when is_binary(exchange_id) when is_binary(asset_id) do
+    get!("#{@base_path}/#{exchange_id}/#{asset_id}")
+  end
+
+  @doc """
+  Get public key to encrypt exchange credentials
+  """
+  def get_credentials_public_key() do
+    get!("#{@base_path}/credentials_public_key")
   end
 end
