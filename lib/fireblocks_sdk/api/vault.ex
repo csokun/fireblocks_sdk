@@ -228,10 +228,10 @@ defmodule FireblocksSdk.Api.Vault do
   ])
   ```
 
-  Supported options:\n#{NimbleOptions.docs(Schema.paged_vault_accounts_request_filters())}
+  Supported options:\n#{NimbleOptions.docs(Schema.vault_listing_request())}
   """
-  def list(options) do
-    {:ok, params} = NimbleOptions.validate(options, Schema.paged_vault_accounts_request_filters())
+  def list(listing) do
+    {:ok, params} = NimbleOptions.validate(listing, Schema.vault_listing_request())
     get!("#{@base_path}/accounts_paged?#{URI.encode_query(params)}")
   end
 
@@ -258,10 +258,37 @@ defmodule FireblocksSdk.Api.Vault do
   end
 
   @doc """
-  Lists all addresses for specific asset of vault account.
+  Creates a new deposit address for an asset of a vault account.
   """
-  def get_deposit_addresses(vault_id, asset_id) do
-    get!("#{@accounts_path}/#{vault_id}/#{asset_id}/addresses")
+  def create_new_asset_deposit_address(vault_id, asset_id, idempotentKey \\ "") do
+    post!("#{@accounts_path}/#{vault_id}/#{asset_id}/addresses", "", idempotentKey)
+  end
+
+  @doc """
+  Returns a paginated response of the addresses for a given vault account and asset.
+
+  ```
+  FireblocksSdk.Api.list_vault_asset_addresses([
+    vaultAccountId: "1",
+    assetId: "XLM",
+    limit: 200
+  ])
+  ```
+
+  Options:\n#{NimbleOptions.docs(Schema.vault_asset_addresses_request())}
+  """
+  def list_vault_asset_addresses(options) do
+    {:ok, params} = NimbleOptions.validate(options, Schema.vault_asset_addresses_request())
+    vaultId = params[:vaultAccountId]
+    assetId = params[:assetId]
+
+    query_string =
+      params
+      |> Keyword.delete(:vaultAccountId)
+      |> Keyword.delete(:assetId)
+      |> Jason.encode!()
+
+    get!("#{@accounts_path}/#{vaultId}/#{assetId}/addresses_paginated?#{query_string}")
   end
 
   @doc """

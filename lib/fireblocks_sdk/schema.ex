@@ -2,7 +2,6 @@ defmodule FireblocksSdk.Schema do
   @moduledoc false
 
   @pagination [
-    orderBy: [type: {:in, [:asc, :desc]}],
     limit: [
       type: :non_neg_integer,
       default: 200,
@@ -88,13 +87,14 @@ defmodule FireblocksSdk.Schema do
 
   @virtual_type [:off_exchange, :default, :oec_fee_bank]
 
-  def paged_vault_accounts_request_filters(),
+  def vault_listing_request(),
     do:
       [
         namePrefix: [type: :string],
         nameSuffix: [type: :string],
         minAmountThreshold: [type: :non_neg_integer],
-        assetId: [type: :string]
+        assetId: [type: :string],
+        orderBy: [type: {:in, [:asc, :desc]}, doc: "order by `:asc` or `:desc`"]
       ] ++ @pagination
 
   def vault_balance_filter(),
@@ -102,6 +102,13 @@ defmodule FireblocksSdk.Schema do
       accountNamePrefix: [type: :string],
       accountNameSuffic: [type: :string]
     ]
+
+  def vault_asset_addresses_request(),
+    do:
+      [
+        vaultAccountId: [type: :string, required: true],
+        assetId: [type: :string, required: true]
+      ] ++ @pagination
 
   def vault_asset_wallets(),
     do:
@@ -115,7 +122,8 @@ defmodule FireblocksSdk.Schema do
           type: :string,
           doc:
             "When specified, only asset wallets cross vault accounts that have this asset ID are returned."
-        ]
+        ],
+        orderBy: [type: {:in, [:asc, :desc]}, doc: "order by `:asc` or `:desc`"]
       ] ++ @pagination
 
   def transaction_filter(),
