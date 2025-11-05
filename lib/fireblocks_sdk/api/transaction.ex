@@ -53,7 +53,7 @@ defmodule FireblocksSdk.Api.Transaction do
           acc
       end)
 
-    %{transactions: data, next: pages.next, previous: pages.previous}
+    %{transactions: data, next: pages.next, previous: pages.prev}
   end
 
   @doc """
