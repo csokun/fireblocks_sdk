@@ -159,7 +159,9 @@ defmodule FireblocksSdk.Schema do
       destWalletId: [
         type: :string,
         doc: "Returns only results where the destination is a specific end user wallet"
-      ]
+      ],
+      next: [type: :string, doc: "Retrieve the next page of results"],
+      prev: [type: :string, doc: "Retrieve the previous page of results"]
     ]
 
   def create_transaction_request(),

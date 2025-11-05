@@ -37,7 +37,23 @@ defmodule FireblocksSdk.Api.Transaction do
       |> atom_to_string([:orderBy])
       |> URI.encode_query()
 
-    get!("#{@base_path}?#{query_string}")
+    [_, data, headers] = FireblocksSdk.Request.get("#{@base_path}?#{query_string}")
+
+    pages =
+      Enum.reduce(headers, %{next: nil, prev: nil}, fn
+        {"next-page", url}, acc ->
+          next = extract_query(url) |> Map.get("next")
+          Map.put(acc, :next, next)
+
+        {"prev-page", url}, acc ->
+          prev = extract_query(url) |> Map.get("prev")
+          Map.put(acc, :prev, prev)
+
+        _, acc ->
+          acc
+      end)
+
+    %{transactions: data, next: pages.next, previous: pages.previous}
   end
 
   @doc """
@@ -182,5 +198,12 @@ defmodule FireblocksSdk.Api.Transaction do
     ])
     |> Enum.into(%{})
     |> Jason.encode!()
+  end
+
+  def extract_query(url) do
+    url
+    |> URI.parse()
+    |> Map.get(:query, "")
+    |> URI.decode_query()
   end
 end
