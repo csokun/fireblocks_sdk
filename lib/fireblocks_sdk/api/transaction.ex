@@ -200,7 +200,7 @@ defmodule FireblocksSdk.Api.Transaction do
     |> Jason.encode!()
   end
 
-  def extract_query(url) do
+  defp extract_query(url) do
     url
     |> URI.parse()
     |> Map.get(:query, "")

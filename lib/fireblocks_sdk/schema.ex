@@ -57,8 +57,6 @@ defmodule FireblocksSdk.Schema do
     :blocked
   ]
 
-  @transaction_order_by [:createdAt, :lastUpdated]
-
   @peer_type [
     :vault_account,
     :exchange_account,
@@ -70,6 +68,12 @@ defmodule FireblocksSdk.Schema do
     :compound,
     :one_time_address,
     :oec_partner
+  ]
+
+  @peer [
+    type: {:in, @peer_type},
+    doc:
+      "one of `:vault_account`, `:exchange_account`, `:internal_wallet`, `:external_wallet`, `:unknown`, `:network_connection`, `:fiat_account`, `:compound`, `:one_time_address`, `:oec_partner`"
   ]
 
   @operation_type [
@@ -138,9 +142,16 @@ defmodule FireblocksSdk.Schema do
         doc:
           "Unix timestamp in milliseconds. Returns only transactions created after the specified date"
       ],
-      status: [type: {:in, @transaction_status}],
-      orderBy: [type: {:in, @transaction_order_by}],
-      sort: [type: {:in, [:asc, :desc]}],
+      status: [
+        type: {:in, @transaction_status},
+        doc:
+          "available values `:submitted`, `:queued`, `:pending_signature`, `:pending_authorization`, `:pending_3rd_party_manual_approval`, `:pending_3rd_party`, `:broadcasting`, `:confirming`, `:completed`, `:pending_aml_screening`, `:partially_completed`, `:cancelling`, `:cancelled`, `:rejected`, `:failed`, `:timeout`, `:blocked`"
+      ],
+      orderBy: [
+        type: {:in, [:createdAt, :lastUpdated]},
+        doc: "available values `:createdAt`, `:lastUpdated`"
+      ],
+      sort: [type: {:in, [:asc, :desc]}, doc: "one of `:asc` or `:desc`"],
       limit: [
         type: :integer,
         doc:
@@ -148,8 +159,8 @@ defmodule FireblocksSdk.Schema do
       ],
       txHash: [type: :string, doc: "Returns only results with a specified txHash"],
       assets: [type: :string, doc: "A list of assets to filter by, seperated by commas"],
-      sourceType: [type: {:in, @peer_type}],
-      destType: [type: {:in, @peer_type}],
+      sourceType: @peer,
+      destType: @peer,
       sourceId: [type: :string],
       destId: [type: :string, doc: "The destination ID of the transaction"],
       sourceWalletId: [
@@ -170,7 +181,7 @@ defmodule FireblocksSdk.Schema do
       source: [
         type: :map,
         keys: [
-          type: [type: {:in, @peer_type}],
+          type: @peer,
           id: [type: :string],
           virtualId: [type: :string],
           virtualType: [type: {:in, @virtual_type}],
@@ -180,7 +191,7 @@ defmodule FireblocksSdk.Schema do
       destination: [
         type: :map,
         keys: [
-          type: [type: {:in, @peer_type}],
+          type: @peer,
           id: [type: :string],
           virtualId: [type: :string],
           virtualType: [type: {:in, @virtual_type}],
@@ -285,7 +296,7 @@ defmodule FireblocksSdk.Schema do
 
   def transaction_set_confirmation_request(),
     do: [
-      type: [type: {:in, [:txId, :txHash]}],
+      type: [type: {:in, [:txId, :txHash]}, doc: "available value `:txId`, `:txHash`"],
       id: [type: :string, doc: "Fireblocks transaction id or blockchain transaction hash"],
       numOfConfirmations: [type: :integer, default: 0]
     ]
