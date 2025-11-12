@@ -1,4 +1,16 @@
 defmodule FireblocksSdk.Api.InternalWallet do
+  @moduledoc """
+  Internal Wallets are whitelisted wallets that belong to you outside of Fireblocks.
+
+    - You can see the balance of the Internal Wallet via Fireblocks
+    - You cannot initiate transactions from Internal Wallets through Fireblocks
+
+  **Note:**
+
+    - BTC-based assets belonging to whitelisted addresses cannot be retrieved between 00:00 UTC and 00:01 UTC daily due to third-party provider, Blockchain, being unavailable for this 60 second period. Please wait until the next minute to retrieve BTC-based assets.
+    - The list of assets returned will NOT include the balances anymore.
+  """
+
   alias FireblocksSdk.Schema
 
   import FireblocksSdk.Request
@@ -10,14 +22,14 @@ defmodule FireblocksSdk.Api.InternalWallet do
 
   Note: BTC-based assets belonging to whitelisted addresses cannot be retrieved between 00:00 UTC and 00:01 UTC daily due to third-party provider, Blockchair, being unavailable for this 60 second period. Please wait until the next minute to retrieve BTC-based assets.
   """
-  def get_wallets() do
+  def list() do
     get!(@base_path)
   end
 
   @doc """
   Returns all assets in an internal wallet by ID.
   """
-  def get_wallet(wallet_id) when is_binary(wallet_id) do
+  def get(wallet_id) when is_binary(wallet_id) do
     get!("#{@base_path}/#{wallet_id}")
   end
 
@@ -26,6 +38,17 @@ defmodule FireblocksSdk.Api.InternalWallet do
   """
   def get_wallet_asset(wallet_id, asset_id) do
     get!("#{@base_path}/#{wallet_id}/#{asset_id}")
+  end
+
+  @doc """
+  Returns a paginated response of assets in an internal wallet.
+  """
+  def get_wallet_assets(wallet_id, page_size \\ 50, page_cusor \\ "") do
+    query =
+      %{pageSize: page_size, pageCusor: page_cusor}
+      |> URI.encode_query()
+
+    get!("#{@base_path}/#{wallet_id}/assets?#{query}")
   end
 
   @doc """
