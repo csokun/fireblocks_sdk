@@ -10,14 +10,14 @@ defmodule FireblocksSdk.Api.ExternalWallet do
 
   Note: BTC-based assets belonging to whitelisted addresses cannot be retrieved between 00:00 UTC and 00:01 UTC daily due to third-party provider, Blockchair, being unavailable for this 60 second period. Please wait until the next minute to retrieve BTC-based assets.
   """
-  def get_wallets() do
+  def list() do
     get!(@base_path)
   end
 
   @doc """
   Returns all assets in an external wallet by ID.
   """
-  def get_wallet(wallet_id) when is_binary(wallet_id) do
+  def get(wallet_id) when is_binary(wallet_id) do
     get!("#{@base_path}/#{wallet_id}")
   end
 
