@@ -76,17 +76,6 @@ defmodule FireblocksSdk.Schema do
       "one of `:vault_account`, `:exchange_account`, `:internal_wallet`, `:external_wallet`, `:unknown`, `:network_connection`, `:fiat_account`, `:compound`, `:one_time_address`, `:oec_partner`"
   ]
 
-  @operation_type [
-    :transfer,
-    :mint,
-    :burn,
-    :supply_to_compound,
-    :redeem_from_compound,
-    :raw,
-    :contract_call,
-    :typed_message
-  ]
-
   @fee_level [:high, :medium, :low]
 
   @virtual_type [:off_exchange, :default, :oec_fee_bank]
@@ -209,7 +198,21 @@ defmodule FireblocksSdk.Schema do
         doc: "For **TRANSFER** operations, the requested amount to transfer, in the asset’s unit."
       ],
       operation: [
-        type: {:in, @operation_type}
+        type:
+          {:in,
+           [
+             :transfer,
+             :mint,
+             :burn,
+             :contract_call,
+             :program_call,
+             :typed_message,
+             :raw,
+             :approve,
+             :enable_asset
+           ]},
+        doc:
+          "available value `:transfer`, `:mint`, `:burn`, `:contract_call`, `:program_call`, `:raw`, `:typed_message`, `:approve`, `:enable_asset`"
       ],
       fee: [type: :string],
       feeLevel: [
