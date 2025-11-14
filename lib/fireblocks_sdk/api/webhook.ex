@@ -265,7 +265,6 @@ defmodule FireblocksSdk.Api.Webhook do
     {:ok, options} = NimbleOptions.validate(notification, @webhook_v2_resend_by_resource_request)
 
     webhook_id = options[:webhookId]
-    resource_id = options[:resourceId]
 
     params =
       options
@@ -329,6 +328,6 @@ defmodule FireblocksSdk.Api.Webhook do
   def get_resend_job_status(webhook_id, job_id)
       when is_binary(webhook_id)
       when is_binary(job_id) do
-    get!("#{base_path}/#{webhook_id}/notifications/resend_failed/jobs/#{job_id}")
+    get!("#{@base_path}/#{webhook_id}/notifications/resend_failed/jobs/#{job_id}")
   end
 end
