@@ -29,6 +29,15 @@ defmodule FireblocksSdk.Request do
     data
   end
 
+  def patch(path, data, idempotentKey \\ "") do
+    request(:patch, path, data, idempotentKey)
+  end
+
+  def patch!(path, data, idempotentKey \\ "") do
+    [_, data, _] = patch(path, data, idempotentKey)
+    data
+  end
+
   def delete(path), do: request(:delete, path)
 
   def delete!(path) do
