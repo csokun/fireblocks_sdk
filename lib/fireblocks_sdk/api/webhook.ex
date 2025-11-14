@@ -5,7 +5,7 @@ defmodule FireblocksSdk.Api.Webhook do
 
   import FireblocksSdk.Request
 
-  @base_path "/v1/webhook"
+  @base_path "/v1/webhooks"
 
   @webhook_v2_create_request [
     url: [type: :string, required: true],
@@ -28,7 +28,7 @@ defmodule FireblocksSdk.Api.Webhook do
   end
 
   @webhook_v2_list_request [
-    order: [type: {:in, [:asc, :desc]}, doc: "available value: `:asc`, `:desc`"],
+    order: [type: {:in, [:asc, :desc]}, default: :desc, doc: "available value: `:asc`, `:desc`"],
     pageCursor: [type: :string],
     pageSize: [type: :integer, default: 10]
   ]
@@ -39,7 +39,7 @@ defmodule FireblocksSdk.Api.Webhook do
   Options:\n#{NimbleOptions.docs(@webhook_v2_list_request)}
   """
   def list(webhook) do
-    {:ok, options} = NimbleOptions.validate(webhook, @webhook_v2_create_request)
+    {:ok, options} = NimbleOptions.validate(webhook, @webhook_v2_list_request)
 
     query_string =
       options
