@@ -63,6 +63,11 @@ defmodule FireblocksSdk.Api.Tokenization do
   """
   def link(link_req, idempotentKey \\ "") do
     {:ok, params} = NimbleOptions.validate(link_req, @tokenization_link_request)
+
+    params =
+      params
+      |> atom_to_upper([:type])
+
     post!("#{@base_path}/tokens/link", params, idempotentKey)
   end
 

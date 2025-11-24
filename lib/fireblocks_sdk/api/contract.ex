@@ -173,6 +173,7 @@ defmodule FireblocksSdk.Api.Contract do
       params
       |> Keyword.delete(:baseAssetId)
       |> Keyword.delete(:contractAddress)
+      |> atom_to_upper([:feeLevel])
       |> Jason.encode!()
 
     post!(
@@ -227,6 +228,7 @@ defmodule FireblocksSdk.Api.Contract do
       params
       |> Keyword.delete(:baseAssetId)
       |> Keyword.delete(:contractAddress)
+      |> atom_to_upper([:dataType])
       |> Jason.encode!()
 
     post!(
