@@ -442,7 +442,11 @@ defmodule FireblocksSdk.Schema do
     do: [
       blockchainId: [type: :string],
       assetId: [type: :string],
-      vaultAccountId: [type: :string, required: true],
+      vaultAccountId: [
+        type: :string,
+        required: true,
+        doc: "The id of the vault account that initiated the request to issue the token"
+      ],
       createParams: [type: :any, required: true],
       displayName: [type: :string],
       useGasless: [type: :boolean],
