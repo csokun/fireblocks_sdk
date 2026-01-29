@@ -1,7 +1,7 @@
 defmodule FireblocksSdk.MixProject do
   use Mix.Project
 
-  @version "0.1.8"
+  @version "0.2.0"
   @repo_url "https://github.com/csokun/fireblocks_sdk"
 
   def getVersion(), do: @version
@@ -35,11 +35,11 @@ defmodule FireblocksSdk.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:finch, "~> 0.20"},
+      {:finch, "~> 0.21"},
       {:joken, "~> 2.6"},
       {:nimble_options, "~> 1.1"},
       {:uuid, "~> 1.1"},
-      {:ex_doc, "~> 0.38", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.40", only: :dev, runtime: false},
       {:jason, "~> 1.4"}
     ]
   end
