@@ -20,7 +20,7 @@ defmodule FireblocksSdk.Api.Vault do
   """
   def create(vault, idempotentKey \\ "") do
     {:ok, options} = NimbleOptions.validate(vault, Schema.vault_create_request())
-    params = options |> Jason.encode!()
+    params = options |> Enum.into(%{}) |> Jason.encode!()
     post!(@accounts_path, params, idempotentKey)
   end
 
@@ -232,7 +232,13 @@ defmodule FireblocksSdk.Api.Vault do
   """
   def list(listing) do
     {:ok, params} = NimbleOptions.validate(listing, Schema.vault_listing_request())
-    get!("#{@base_path}/accounts_paged?#{URI.encode_query(params)}")
+
+    query_string =
+      params
+      |> atom_to_upper([:orderBy])
+      |> URI.encode_query()
+
+    get!("#{@base_path}/accounts_paged?#{query_string}")
   end
 
   @doc """
