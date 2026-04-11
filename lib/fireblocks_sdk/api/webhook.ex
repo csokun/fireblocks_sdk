@@ -23,7 +23,7 @@ defmodule FireblocksSdk.Api.Webhook do
   """
   def create(webhook, idempotentKey \\ "") do
     {:ok, options} = NimbleOptions.validate(webhook, @create_schema)
-    params = options |> Jason.encode!()
+    params = options |> Enum.into(%{}) |> Jason.encode!()
     post!("#{@base_path}", params, idempotentKey)
   end
 
@@ -74,7 +74,13 @@ defmodule FireblocksSdk.Api.Webhook do
   def update(webhook, idempotentKey \\ "") do
     {:ok, options} = NimbleOptions.validate(webhook, @update_schema)
     webhook_id = options[:webhookId]
-    params = options |> Keyword.delete(:webhookId) |> Jason.encode!()
+
+    params =
+      options
+      |> Keyword.delete(:webhookId)
+      |> Enum.into(%{})
+      |> Jason.encode!()
+
     patch!("#{@base_path}/#{webhook_id}", params, idempotentKey)
   end
 
@@ -273,6 +279,7 @@ defmodule FireblocksSdk.Api.Webhook do
       options
       |> Keyword.delete(:webhookId)
       |> atom_to_upper([:excludeStatuses])
+      |> Enum.into(%{})
       |> Jason.encode!()
 
     post!(
@@ -316,6 +323,7 @@ defmodule FireblocksSdk.Api.Webhook do
     params =
       options
       |> Keyword.delete(:webhookId)
+      |> Enum.into(%{})
       |> Jason.encode!()
 
     post!(

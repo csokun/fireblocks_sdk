@@ -41,6 +41,7 @@ defmodule FireblocksSdk.Api.ContractInteractions do
       params
       |> Keyword.delete(:baseAssetId)
       |> Keyword.delete(:contractAddress)
+      |> Enum.into(%{})
       |> Jason.encode!()
 
     post!(
@@ -98,6 +99,7 @@ defmodule FireblocksSdk.Api.ContractInteractions do
       |> Keyword.delete(:baseAssetId)
       |> Keyword.delete(:contractAddress)
       |> atom_to_upper([:feeLevel])
+      |> Enum.into(%{})
       |> Jason.encode!()
 
     post!(
@@ -153,6 +155,7 @@ defmodule FireblocksSdk.Api.ContractInteractions do
       |> Keyword.delete(:baseAssetId)
       |> Keyword.delete(:contractAddress)
       |> atom_to_upper([:dataType])
+      |> Enum.into(%{})
       |> Jason.encode!()
 
     post!(

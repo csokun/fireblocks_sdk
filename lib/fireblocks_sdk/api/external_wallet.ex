@@ -35,7 +35,7 @@ defmodule FireblocksSdk.Api.ExternalWallet do
   """
   def create(wallet, idempotentKey \\ "") do
     {:ok, options} = NimbleOptions.validate(wallet, Schema.wallet_create_request())
-    data = options |> Jason.encode!()
+    data = options |> Enum.into(%{}) |> Jason.encode!()
     post!(@base_path, data, idempotentKey)
   end
 
@@ -60,6 +60,7 @@ defmodule FireblocksSdk.Api.ExternalWallet do
       options
       |> Keyword.delete(:walletId)
       |> Keyword.delete(:assetId)
+      |> Enum.into(%{})
       |> Jason.encode!()
 
     post!("#{@base_path}/#{wallet_id}/#{asset_id}", data, idempotentKey)

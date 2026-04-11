@@ -68,6 +68,7 @@ defmodule FireblocksSdk.Api.Contract do
       options
       |> Keyword.delete(:contractId)
       |> Keyword.delete(:assetId)
+      |> Enum.into(%{})
       |> Jason.encode!()
 
     post!("#{@contract_endpoint}/#{contract_id}/assets/#{asset_id}", params, idempotent_key)

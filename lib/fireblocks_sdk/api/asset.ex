@@ -48,7 +48,8 @@ defmodule FireblocksSdk.Api.Asset do
   """
   def register(asset, idempotent_key \\ "") do
     {:ok, params} = NimbleOptions.validate(asset, @register_asset_schema)
-    post!("#{@assets_path}", Jason.encode!(params), idempotent_key)
+    data = params |> Enum.into(%{}) |> Jason.encode!()
+    post!("#{@assets_path}", data, idempotent_key)
   end
 
   @doc """

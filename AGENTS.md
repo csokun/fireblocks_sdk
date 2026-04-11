@@ -6,14 +6,14 @@ This is an Elixir SDK for the Fireblocks API. It is generated/maintained against
 **Core Principle:** The Swagger specification (`swagger.json`) is the **single source of truth**. All Elixir modules, types, and documentation must strictly reflect the current state of the spec.
 
 ## Key Resources
-- **Swagger Spec:** `https://docs.fireblocks.com/api/v1/swagger.json` (Always fetch latest before changes)
+- **Swagger Spec:** `https://docs.fireblocks.com/api/v1/swagger.json`
 - **Source Code:** `lib/`
 - **Tests:** `test/`
 
 ## Workflow for Adding/Updating Features
 
 ### 1. Analysis Phase
-- **Fetch Latest Spec:** Always download the latest `swagger.json` from the URL above.
+- **Fetch Latest Spec:** Always download the latest `swagger.json` from the URL above (if `swagger.json` file is not found in the root folder)
 - **Diff Check:** Compare the new spec with the previous version (or existing code) to identify:
   - New endpoints
   - Changed request/response schemas
@@ -40,6 +40,15 @@ This is an Elixir SDK for the Fireblocks API. It is generated/maintained against
   - **Sync:** Copy `summary` and `description` from Swagger into `@doc`.
   - **Specs:** Include `@spec` reflecting the validated input (keyword list) and the decoded response struct/map.
   - **Deprecation:** Add `@deprecated "See Swagger spec for replacement"` if marked in the spec.
+- **POST/PUT:** convert NimbleOption parsed value into %{} using `Enum.into(%{})` before encode it to json
+
+```elixir
+    def function_one(params, idempotentKey \\ "") do
+      {:ok, params} = NimbleOptions.validate(params, @function_one_schema)
+      data = params |> Enum.into(%{}) |> Jason.encode!()
+      post!("endpoint path", data, idempotentKey)
+    end
+```
 
 ### 3. Validation
 - **Compile:** Ensure `mix compile` passes with no warnings.

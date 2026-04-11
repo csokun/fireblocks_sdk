@@ -54,6 +54,7 @@ defmodule FireblocksSdk.Api.GasStation do
     params =
       options
       |> Keyword.delete(:assetId)
+      |> Enum.into(%{})
       |> Jason.encode!()
 
     put!(path, params, idempotentKey)

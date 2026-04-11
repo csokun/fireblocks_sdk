@@ -52,7 +52,8 @@ defmodule FireblocksSdk.Api.Tokenization do
   """
   def create(params, idempotentKey \\ "") do
     {:ok, params} = NimbleOptions.validate(params, @create_schema)
-    post!("#{@base_path}/tokens", params, idempotentKey)
+    data = params |> Enum.into(%{}) |> Jason.encode!()
+    post!("#{@base_path}/tokens", data, idempotentKey)
   end
 
   @link_schema [
@@ -86,6 +87,8 @@ defmodule FireblocksSdk.Api.Tokenization do
     params =
       params
       |> atom_to_upper([:type])
+      |> Enum.into(%{})
+      |> Jason.encode!()
 
     post!("#{@base_path}/tokens/link", params, idempotentKey)
   end
@@ -137,7 +140,8 @@ defmodule FireblocksSdk.Api.Tokenization do
   """
   def get_deterministic_address(params, idempotentKey \\ "") do
     {:ok, params} = NimbleOptions.validate(params, @get_deterministic_address_schema)
-    post!("#{@base_path}/tokens/deterministic_address", params, idempotentKey)
+    data = params |> Enum.into(%{}) |> Jason.encode!()
+    post!("#{@base_path}/tokens/deterministic_address", data, idempotentKey)
   end
 
   def templates() do

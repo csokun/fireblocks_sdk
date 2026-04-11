@@ -136,7 +136,7 @@ defmodule FireblocksSdk.Api.Vault do
   def set_auto_fuel(fuel, idempotentKey \\ "") do
     {:ok, options} = NimbleOptions.validate(fuel, @set_auto_fuel_schema)
     vault_id = options[:vaultId]
-    params = options |> Keyword.delete(:vaultId) |> Jason.encode!()
+    params = options |> Keyword.delete(:vaultId) |> Enum.into(%{}) |> Jason.encode!()
     post!("#{@accounts_path}/#{vault_id}/set_auto_fuel", params, idempotentKey)
   end
 
@@ -269,6 +269,7 @@ defmodule FireblocksSdk.Api.Vault do
       |> Keyword.delete(:vaultId)
       |> Keyword.delete(:assetId)
       |> Keyword.delete(:addressId)
+      |> Enum.into(%{})
       |> Jason.encode!()
 
     put!(
@@ -279,12 +280,12 @@ defmodule FireblocksSdk.Api.Vault do
   end
 
   @list_schema [
-    namePrefix: [type: :string],
-    nameSuffix: [type: :string],
-    minAmountThreshold: [type: :non_neg_integer],
-    assetId: [type: :string],
-    orderBy: [type: {:in, [:asc, :desc]}, doc: "order by `:asc` or `:desc`"]
-  ] ++ @pagination
+                 namePrefix: [type: :string],
+                 nameSuffix: [type: :string],
+                 minAmountThreshold: [type: :non_neg_integer],
+                 assetId: [type: :string],
+                 orderBy: [type: {:in, [:asc, :desc]}, doc: "order by `:asc` or `:desc`"]
+               ] ++ @pagination
 
   @doc """
   Gets a list of vault accounts per page matching the given filter or path
@@ -340,9 +341,9 @@ defmodule FireblocksSdk.Api.Vault do
   end
 
   @list_vault_asset_addresses_schema [
-    vaultAccountId: [type: :string, required: true],
-    assetId: [type: :string, required: true]
-  ] ++ @pagination
+                                       vaultAccountId: [type: :string, required: true],
+                                       assetId: [type: :string, required: true]
+                                     ] ++ @pagination
 
   @doc """
   Returns a paginated response of the addresses for a given vault account and asset.
@@ -393,16 +394,21 @@ defmodule FireblocksSdk.Api.Vault do
   end
 
   @get_asset_wallets_schema [
-    totalAmountLargerThan: [
-      type: {:or, [:non_neg_integer, :float]},
-      doc: "When specified, only asset wallets with total balance larger than this amount are returned."
-    ],
-    assetId: [
-      type: :string,
-      doc: "When specified, only asset wallets cross vault accounts that have this asset ID are returned."
-    ],
-    orderBy: [type: {:in, [:asc, :desc]}, doc: "order by `:asc` or `:desc`"]
-  ] ++ @pagination
+                              totalAmountLargerThan: [
+                                type: {:or, [:non_neg_integer, :float]},
+                                doc:
+                                  "When specified, only asset wallets with total balance larger than this amount are returned."
+                              ],
+                              assetId: [
+                                type: :string,
+                                doc:
+                                  "When specified, only asset wallets cross vault accounts that have this asset ID are returned."
+                              ],
+                              orderBy: [
+                                type: {:in, [:asc, :desc]},
+                                doc: "order by `:asc` or `:desc`"
+                              ]
+                            ] ++ @pagination
 
   @doc """
   Gets all asset wallets at all of the vault accounts in your workspace. An asset wallet is an asset at a vault account. This method allows fast traversal of all account balances.

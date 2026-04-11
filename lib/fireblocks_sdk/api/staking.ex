@@ -184,7 +184,12 @@ defmodule FireblocksSdk.Api.Staking do
     {:ok, options} = NimbleOptions.validate(staking, @stake_schema)
 
     chain_descriptor = options[:chainDescriptor]
-    params = options |> Keyword.delete(:chainDescriptor) |> Jason.encode!()
+
+    params =
+      options
+      |> Keyword.delete(:chainDescriptor)
+      |> Enum.into(%{})
+      |> Jason.encode!()
 
     post!(
       "#{@base_path}/chains/#{chain_descriptor}/stake",
@@ -211,7 +216,12 @@ defmodule FireblocksSdk.Api.Staking do
     {:ok, options} = NimbleOptions.validate(unstaking, @unstake_schema)
 
     chain_descriptor = options[:chainDescriptor]
-    params = options |> Keyword.delete(:chainDescriptor) |> Jason.encode!()
+
+    params =
+      options
+      |> Keyword.delete(:chainDescriptor)
+      |> Enum.into(%{})
+      |> Jason.encode!()
 
     post!(
       "#{@base_path}/chains/#{chain_descriptor}/unstake",
@@ -238,7 +248,12 @@ defmodule FireblocksSdk.Api.Staking do
     {:ok, options} = NimbleOptions.validate(withdrawal, @withdraw_schema)
 
     chain_descriptor = options[:chainDescriptor]
-    params = options |> Keyword.delete(:chainDescriptor) |> Jason.encode!()
+
+    params =
+      options
+      |> Keyword.delete(:chainDescriptor)
+      |> Enum.into(%{})
+      |> Jason.encode!()
 
     post!(
       "#{@base_path}/chains/#{chain_descriptor}/withdraw",
@@ -265,7 +280,12 @@ defmodule FireblocksSdk.Api.Staking do
     {:ok, options} = NimbleOptions.validate(claim_request, @claim_reawards_schema)
 
     chain_descriptor = options[:chainDescriptor]
-    params = options |> Keyword.delete(:chainDescriptor) |> Jason.encode!()
+
+    params =
+      options
+      |> Keyword.delete(:chainDescriptor)
+      |> Enum.into(%{})
+      |> Jason.encode!()
 
     post!(
       "#{@base_path}/chains/#{chain_descriptor}/claim_rewards",
@@ -293,7 +313,12 @@ defmodule FireblocksSdk.Api.Staking do
     {:ok, options} = NimbleOptions.validate(split_request, @split_schema)
 
     chain_descriptor = options[:chainDescriptor]
-    params = options |> Keyword.delete(:chainDescriptor) |> Jason.encode!()
+
+    params =
+      options
+      |> Keyword.delete(:chainDescriptor)
+      |> Enum.into(%{})
+      |> Jason.encode!()
 
     post!(
       "#{@base_path}/chains/#{chain_descriptor}/split",
@@ -320,7 +345,12 @@ defmodule FireblocksSdk.Api.Staking do
     {:ok, options} = NimbleOptions.validate(merge_request, @merge_schema)
 
     chain_descriptor = options[:chainDescriptor]
-    params = options |> Keyword.delete(:chainDescriptor) |> Jason.encode!()
+
+    params =
+      options
+      |> Keyword.delete(:chainDescriptor)
+      |> Enum.into(%{})
+      |> Jason.encode!()
 
     post!(
       "#{@base_path}/chains/#{chain_descriptor}/merge",
