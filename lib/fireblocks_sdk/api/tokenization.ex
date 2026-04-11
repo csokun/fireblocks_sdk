@@ -97,14 +97,14 @@ defmodule FireblocksSdk.Api.Tokenization do
   Unlink a token. The token will be unlinked from the workspace. The token will not be deleted on chain nor the refId, only the link to the workspace will be removed.
   """
   def unlink(link_id) when is_binary(link_id) do
-    delete!("#{@base_path}/tokens/link/#{link_id}")
+    delete!("#{@base_path}/tokens/#{link_id}")
   end
 
   @doc """
   Return a linked token, with its status and metadata.
   """
   def get_link(link_id) when is_binary(link_id) do
-    get!("#{@base_path}/tokens/link/#{link_id}")
+    get!("#{@base_path}/tokens/#{link_id}")
   end
 
   @get_deterministic_address_schema [
@@ -141,7 +141,7 @@ defmodule FireblocksSdk.Api.Tokenization do
   def get_deterministic_address(params, idempotentKey \\ "") do
     {:ok, params} = NimbleOptions.validate(params, @get_deterministic_address_schema)
     data = params |> Enum.into(%{}) |> Jason.encode!()
-    post!("#{@base_path}/tokens/deterministic_address", data, idempotentKey)
+    post!("#{@base_path}/multichain/deterministic_address", data, idempotentKey)
   end
 
   def templates() do

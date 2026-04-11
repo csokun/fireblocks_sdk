@@ -337,8 +337,7 @@ defmodule FireblocksSdk.Api.Webhook do
   Get the status of a resend job
   """
   def get_resend_job_status(webhook_id, job_id)
-      when is_binary(webhook_id)
-      when is_binary(job_id) do
+      when is_binary(webhook_id) and is_binary(job_id) do
     get!("#{@base_path}/#{webhook_id}/notifications/resend_failed/jobs/#{job_id}")
   end
 end
