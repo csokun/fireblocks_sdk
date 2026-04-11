@@ -1,0 +1,54 @@
+# Fireblocks SDK
+
+## Project Overview
+This is an Elixir SDK for the Fireblocks API. It is generated/maintained against the official OpenAPI/Swagger specification.
+
+**Core Principle:** The Swagger specification (`swagger.json`) is the **single source of truth**. All Elixir modules, types, and documentation must strictly reflect the current state of the spec.
+
+## Key Resources
+- **Swagger Spec:** `https://docs.fireblocks.com/api/v1/swagger.json` (Always fetch latest before changes)
+- **Source Code:** `lib/`
+- **Tests:** `test/`
+
+## Workflow for Adding/Updating Features
+
+### 1. Analysis Phase
+- **Fetch Latest Spec:** Always download the latest `swagger.json` from the URL above.
+- **Diff Check:** Compare the new spec with the previous version (or existing code) to identify:
+  - New endpoints
+  - Changed request/response schemas
+  - Deprecated fields
+- **Map to Elixir:** Identify corresponding Elixir modules in `lib/fireblocks_sdk/`.
+
+### 2. Implementation Rules
+- **Module Structure:** Mirror the API tag/path structure.
+- **Typespecs:** Generate definitions using NimbleOption directly from Swagger schema definitions.
+- **Function Signatures:**
+  - Name functions after the operationId or path (snake_case).
+  - Arguments must match required query/path/body parameters.
+  - Use keyword lists for optional query params.
+- **Documentation:**
+  - Copy summary/description from Swagger into `@doc` strings.
+  - Include `@spec` that mirrors the Swagger input/output types.
+  - Add `@deprecated` if marked in Swagger.
+
+### 3. Validation
+- **Compile:** Ensure `mix compile` passes with no warnings.
+- **Dialyzer:** Run `mix dialyzer` to verify type consistency between spec and implementation.
+- **Tests:**
+  - Update mocks/fixtures to match new schema structures.
+  - Ensure all new public functions have test coverage.
+
+## Specific Elixir Conventions
+- **JSON Encoding/Decoding:** Use `Jason` (or project default). Ensure atom keys are handled correctly if using `keys: :atoms`.
+- **Error Handling:** Return `{:ok, result}` or `{:error, reason}` tuples. Map HTTP errors to structured Elixir exceptions or error tuples as defined in `lib/fireblocks_sdk/error.ex`.
+- **Naming:**
+  - Modules: `FireblocksSdk.Vault.Assets` (nested by tag/path).
+  - Functions: `list_vault_accounts/1`, `create_transaction/2`.
+
+## Maintenance Checklist
+- [ ] Did you fetch the latest `swagger.json`?
+- [ ] Are all `@spec` types aligned with the Swagger schema?
+- [ ] Is the `@doc` content synced with the Swagger description?
+- [ ] Did you handle deprecated fields/endpoints correctly?
+- [ ] Do tests pass with the new structure?
