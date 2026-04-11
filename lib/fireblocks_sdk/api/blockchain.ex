@@ -1,16 +1,24 @@
 defmodule FireblocksSdk.Api.Blockchain do
-  alias FireblocksSdk.Schema
   import FireblocksSdk.Request
 
   @base_path "/v1/blockchains"
 
+  @list_schema [
+    protocol: [type: :string, doc: "The blockchain protocol"],
+    deprecated: [type: :boolean, doc: "Is blockchain deprecated"],
+    test: [type: :boolean, doc: "Is test blockchain"],
+    ids: [type: {:list, :string}, doc: "A list of blockchain IDs (max 100)"],
+    pageCursor: [type: :string, doc: "Page cursor to fetch"],
+    pageSize: [type: :non_neg_integer, doc: "Items per page (max 500)"]
+  ]
+
   @doc """
   Returns all blockchains supported by Fireblocks.
 
-  Options:\n#{NimbleOptions.docs(Schema.blockchains_list())}
+  Options:\n#{NimbleOptions.docs(@list_schema)}
   """
   def list(opt \\ []) do
-    {:ok, options} = NimbleOptions.validate(opt, Schema.blockchains_list())
+    {:ok, options} = NimbleOptions.validate(opt, @list_schema)
 
     query_string =
       case options do

@@ -1,6 +1,4 @@
 defmodule FireblocksSdk.Api.GasStation do
-  alias FireblocksSdk.Schema
-
   import FireblocksSdk.Request
 
   @base_path "/v1/gas_station"
@@ -24,6 +22,13 @@ defmodule FireblocksSdk.Api.GasStation do
     get!("#{@base_path}/#{asset}")
   end
 
+  @update_settings_schema [
+    gasThreshold: [type: :string, required: true],
+    gasCap: [type: :string, required: true],
+    maxGasPrice: [type: :string],
+    assetId: [type: :string]
+  ]
+
   @doc """
   Configures gas station settings for ETH or given asset.
 
@@ -35,10 +40,10 @@ defmodule FireblocksSdk.Api.GasStation do
   ])
   ```
 
-  Options:\n#{NimbleOptions.docs(Schema.gas_station_settings_request())}
+  Options:\n#{NimbleOptions.docs(@update_settings_schema)}
   """
   def update_settings(config, idempotentKey \\ "") do
-    {:ok, options} = NimbleOptions.validate(config, Schema.gas_station_settings_request())
+    {:ok, options} = NimbleOptions.validate(config, @update_settings_schema)
 
     path =
       case options[:assetId] do

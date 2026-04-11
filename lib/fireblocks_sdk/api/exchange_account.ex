@@ -1,66 +1,137 @@
 defmodule FireblocksSdk.Api.ExchangeAccount do
-  alias FireblocksSdk.Schema
   import FireblocksSdk.Request
 
   @base_path "/v1/exchange_accounts"
 
+  @trading_account_type [
+    :coin_futures,
+    :coin_margined_swap,
+    :exchange,
+    :funding,
+    :fundable,
+    :futures,
+    :futures_cross,
+    :margin,
+    :margin_cross,
+    :options,
+    :spot,
+    :usdt_margined_swap_cross,
+    :usdt_futures,
+    :unified
+  ]
+
+  @get_accounts_schema [
+    before: [type: :string, doc: "Fetch results before this cursor"],
+    after: [type: :string, doc: "Fetch results after this cursor"],
+    limit: [type: :non_neg_integer, default: 3, doc: "Maximum number of results to return"]
+  ]
+
   @doc """
-  List all exchange accounts.
+  List all exchange accounts (paginated).
 
-  Options: \n#{NimbleOptions.docs(Schema.exchange_accounts_request())}
+  Options:\n#{NimbleOptions.docs(@get_accounts_schema)}
   """
-  def get_accounts(filter) do
-    {:ok, params} = NimbleOptions.validate(filter, Schema.exchange_accounts_request())
-
-    query_string =
-      params
-      |> URI.encode_query()
-
+  def get_accounts(filter \\ []) do
+    {:ok, params} = NimbleOptions.validate(filter, @get_accounts_schema)
+    query_string = params |> URI.encode_query()
     get!("#{@base_path}/paged?#{query_string}")
   end
 
   @doc """
-  Find a specific exchange account.
+  Find a specific exchange account by its ID.
+
+  - `exchange_id`: The ID of the exchange account to retrieve
   """
-  def get_account(exchangeId) when is_binary(exchangeId) do
-    get!("#{@base_path}/#{exchangeId}")
+  def get_account(exchange_id) when is_binary(exchange_id) do
+    get!("#{@base_path}/#{exchange_id}")
   end
 
-  @doc """
-  Transfer funds between trading accounts under the same exchange account.
+  @transfer_schema [
+    exchangeId: [
+      type: :string,
+      required: true,
+      doc: "The ID of the exchange account to transfer from"
+    ],
+    asset: [type: :string, required: true, doc: "The asset to transfer"],
+    amount: [type: :string, required: true, doc: "The amount to transfer"],
+    sourceType: [
+      type: {:in, @trading_account_type},
+      required: true,
+      doc:
+        "The source trading account type. One of `:coin_futures`, `:coin_margined_swap`, `:exchange`, `:funding`, `:fundable`, `:futures`, `:futures_cross`, `:margin`, `:margin_cross`, `:options`, `:spot`, `:usdt_margined_swap_cross`, `:usdt_futures`, `:unified`"
+    ],
+    destType: [
+      type: {:in, @trading_account_type},
+      required: true,
+      doc:
+        "The destination trading account type. One of `:coin_futures`, `:coin_margined_swap`, `:exchange`, `:funding`, `:fundable`, `:futures`, `:futures_cross`, `:margin`, `:margin_cross`, `:options`, `:spot`, `:usdt_margined_swap_cross`, `:usdt_futures`, `:unified`"
+    ]
+  ]
 
-  Options:\n#{NimbleOptions.docs(Schema.exchange_transfer_request())}
+  @doc """
+  Transfer funds between trading accounts on the same exchange account.
+
+  ```
+  FireblocksSdk.Api.ExchangeAccount.transfer([
+    exchangeId: "binance-account-id",
+    asset: "BTC",
+    amount: "0.5",
+    sourceType: :spot,
+    destType: :futures
+  ])
+  ```
+
+  Options:\n#{NimbleOptions.docs(@transfer_schema)}
   """
-  def internal_transfer(trade, idempotentKey \\ "") do
-    {:ok, options} = NimbleOptions.validate(trade, Schema.exchange_transfer_request())
-    exchangeId = options[:exchangeId]
-    data = options |> Keyword.delete(:exchangeId) |> Jason.encode!()
-    post!("#{@base_path}/#{exchangeId}/internal_transfer", data, idempotentKey)
+  def transfer(opts, idempotent_key \\ "") do
+    {:ok, options} = NimbleOptions.validate(opts, @transfer_schema)
+    exchange_id = options[:exchangeId]
+
+    params =
+      options
+      |> Keyword.delete(:exchangeId)
+      |> atom_to_upper([:sourceType, :destType])
+      |> Enum.into(%{})
+      |> Jason.encode!()
+
+    post!("#{@base_path}/#{exchange_id}/internal_transfer", params, idempotent_key)
   end
 
-  @doc """
-  Convert exchange account funds from the source asset to the destination asset. Coinbase (USD to USDC, USDC to USD) and Bitso (MXN to USD) are supported conversions.
-
-  Options:\n#{NimbleOptions.docs(Schema.exchange_convert_request())}
-  """
-  def convert(request, idempotentKey \\ "") do
-    {:ok, options} = NimbleOptions.validate(request, Schema.exchange_convert_request())
-    exchangeId = options[:exchangeId]
-    data = options |> Keyword.delete(:exchangeId) |> Jason.encode!()
-    post!("#{@base_path}/#{exchangeId}/convert", data, idempotentKey)
-  end
-
-  @doc """
-  Find an asset in an exchange account
-  """
-  def get_asset(exchange_id, asset_id) when is_binary(exchange_id) and is_binary(asset_id) do
-    get!("#{@base_path}/#{exchange_id}/#{asset_id}")
-  end
+  @convert_schema [
+    exchangeId: [
+      type: :string,
+      required: true,
+      doc: "The ID of the exchange account to convert assets on"
+    ],
+    amount: [type: :string, required: true, doc: "The amount to convert"],
+    srcAsset: [type: :string, required: true, doc: "The source asset to convert from"],
+    destAsset: [type: :string, required: true, doc: "The destination asset to convert to"]
+  ]
 
   @doc """
-  Get public key to encrypt exchange credentials
+  Convert assets on an exchange account.
+
+  ```
+  FireblocksSdk.Api.ExchangeAccount.convert([
+    exchangeId: "binance-account-id",
+    amount: "100",
+    srcAsset: "USDT",
+    destAsset: "BTC"
+  ])
+  ```
+
+  Options:\n#{NimbleOptions.docs(@convert_schema)}
   """
-  def get_credentials_public_key() do
-    get!("#{@base_path}/credentials_public_key")
+  def convert(opts, idempotent_key \\ "") do
+    {:ok, options} = NimbleOptions.validate(opts, @convert_schema)
+    exchange_id = options[:exchangeId]
+
+    params =
+      options
+      |> Keyword.delete(:exchangeId)
+      |> Enum.into(%{})
+      |> Jason.encode!()
+
+    post!("#{@base_path}/#{exchange_id}/convert", params, idempotent_key)
   end
 end

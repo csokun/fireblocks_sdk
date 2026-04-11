@@ -7,7 +7,7 @@ defmodule FireblocksSdk.Api.EmbeddedWallet do
 
   @base_path "/v1/ncw/wallets"
 
-  @ncw_support_assets [
+  @get_supported_assets_schema [
     pageCursor: [type: :string, doc: "Next page cursor to fetch"],
     pageSize: [type: :integer, doc: "Items per page", default: 200],
     onlyBaseAssets: [type: :boolean, default: true, doc: "Only base assets"]
@@ -16,17 +16,15 @@ defmodule FireblocksSdk.Api.EmbeddedWallet do
   @doc """
   Retrieve supported assets for Non-Custodial Wallets.
 
-  Options:\n#{NimbleOptions.docs(@ncw_support_assets)}
+  Options:\n#{NimbleOptions.docs(@get_supported_assets_schema)}
   """
   def get_supported_assets(opts \\ []) do
-    {:ok, params} = NimbleOptions.validate(opts, @ncw_support_assets)
-    # GET /ncw/wallets/supported_assets
-    # opts: pageCursor, pageSize, onlyBaseAssets
+    {:ok, params} = NimbleOptions.validate(opts, @get_supported_assets_schema)
     query_string = URI.encode_query(params)
     get!("#{@base_path}/supported_assets?#{query_string}")
   end
 
-  @ncw_list_wallet [
+  @list_wallets_schema [
     pageCursor: [type: :string, doc: "Next page cursor to fetch"],
     pageSize: [type: :integer, doc: "Items per page", default: 200],
     onlyBaseAssets: [type: :boolean, default: true, doc: "Only base assets"],
@@ -45,12 +43,11 @@ defmodule FireblocksSdk.Api.EmbeddedWallet do
   @doc """
   List all Non-Custodial Wallets.
 
-  Options:\n#{NimbleOptions.docs(@ncw_list_wallet)}
+  Options:\n#{NimbleOptions.docs(@list_wallets_schema)}
   """
   def list_wallets(opts \\ []) do
-    {:ok, params} = NimbleOptions.validate(opts, @ncw_list_wallet)
-    # GET /ncw/wallets
-    # opts: pageCursor, pageSize, sort, order, enabled
+    {:ok, params} = NimbleOptions.validate(opts, @list_wallets_schema)
+
     query_string =
       params
       |> atom_to_string([:sort])
@@ -64,7 +61,6 @@ defmodule FireblocksSdk.Api.EmbeddedWallet do
   Get a wallet by its ID.
   """
   def get_wallet(wallet_id) do
-    # GET /ncw/wallets/{walletId}
     get!("#{@base_path}/#{wallet_id}")
   end
 
@@ -72,8 +68,6 @@ defmodule FireblocksSdk.Api.EmbeddedWallet do
   Create a new account under a specific Non-Custodial Wallet.
   """
   def create_account(wallet_id, opts \\ [], idempotency_key \\ "") do
-    # POST /ncw/wallets/{walletId}/accounts
-    # opts: account creation params
     post!("#{@base_path}/#{wallet_id}/accounts", Jason.encode!(opts), idempotency_key)
   end
 
@@ -81,7 +75,6 @@ defmodule FireblocksSdk.Api.EmbeddedWallet do
   Get an account by wallet and account ID.
   """
   def get_account(wallet_id, account_id) do
-    # GET /ncw/wallets/{walletId}/accounts/{accountId}
     get!("#{@base_path}/#{wallet_id}/accounts/#{account_id}")
   end
 
@@ -89,7 +82,6 @@ defmodule FireblocksSdk.Api.EmbeddedWallet do
   Retrieve asset by wallet, account, and asset ID.
   """
   def get_asset(wallet_id, account_id, asset_id) do
-    # GET /ncw/wallets/{walletId}/accounts/{accountId}/assets/{assetId}
     get!("#{@base_path}/#{wallet_id}/accounts/#{account_id}/assets/#{asset_id}")
   end
 
@@ -97,7 +89,6 @@ defmodule FireblocksSdk.Api.EmbeddedWallet do
   Refresh asset balance for a wallet/account/asset.
   """
   def refresh_asset_balance(wallet_id, account_id, asset_id, opts \\ []) do
-    # PUT /ncw/wallets/{walletId}/accounts/{accountId}/assets/{assetId}/balance
     put!(
       "#{@base_path}/#{wallet_id}/accounts/#{account_id}/assets/#{asset_id}/balance",
       Jason.encode!(opts)
@@ -108,7 +99,6 @@ defmodule FireblocksSdk.Api.EmbeddedWallet do
   Get addresses for a wallet/account/asset.
   """
   def get_addresses(wallet_id, account_id, asset_id, opts \\ []) do
-    # GET /ncw/wallets/{walletId}/accounts/{accountId}/assets/{assetId}/addresses
     query_string = URI.encode_query(opts)
 
     get!(
@@ -120,7 +110,6 @@ defmodule FireblocksSdk.Api.EmbeddedWallet do
   Get latest backup details for a wallet.
   """
   def get_latest_backup(wallet_id) do
-    # GET /ncw/wallets/{walletId}/backup/latest
     get!("#{@base_path}/#{wallet_id}/backup/latest")
   end
 
@@ -128,7 +117,6 @@ defmodule FireblocksSdk.Api.EmbeddedWallet do
   Get embedded wallet device details.
   """
   def get_device(wallet_id, device_id) do
-    # GET /ncw/wallets/{walletId}/devices/{deviceId}
     get!("#{@base_path}/#{wallet_id}/devices/#{device_id}")
   end
 
@@ -136,7 +124,6 @@ defmodule FireblocksSdk.Api.EmbeddedWallet do
   Get device key setup state.
   """
   def get_device_setup_status(wallet_id, device_id) do
-    # GET /ncw/wallets/{walletId}/devices/{deviceId}/setup_status
     get!("#{@base_path}/#{wallet_id}/devices/#{device_id}/setup_status")
   end
 
@@ -144,7 +131,6 @@ defmodule FireblocksSdk.Api.EmbeddedWallet do
   Get the public key for a derivation path.
   """
   def get_public_key_info(wallet_id, opts \\ []) do
-    # GET /ncw/wallets/{walletId}/public_key_info
     query_string = URI.encode_query(opts)
     get!("#{@base_path}/#{wallet_id}/public_key_info?#{query_string}")
   end
@@ -160,7 +146,6 @@ defmodule FireblocksSdk.Api.EmbeddedWallet do
         address_index,
         opts \\ []
       ) do
-    # GET /ncw/wallets/{walletId}/accounts/{accountId}/assets/{assetId}/{change}/{addressIndex}/public_key_info
     query_string = URI.encode_query(opts)
 
     get!(
@@ -179,7 +164,6 @@ defmodule FireblocksSdk.Api.EmbeddedWallet do
         address_index,
         opts \\ []
       ) do
-    # GET /ncw/{walletId}/accounts/{accountId}/{assetId}/{change}/{addressIndex}/public_key_info
     query_string = URI.encode_query(opts)
 
     get!(

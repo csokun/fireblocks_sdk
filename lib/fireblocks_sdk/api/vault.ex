@@ -1,9 +1,35 @@
 defmodule FireblocksSdk.Api.Vault do
-  alias FireblocksSdk.Schema
   import FireblocksSdk.Request
 
   @base_path "/v1/vault"
   @accounts_path "/v1/vault/accounts"
+
+  # Shared pagination fields used by multiple schemas in this module
+  @pagination [
+    limit: [
+      type: :non_neg_integer,
+      default: 200,
+      doc:
+        "The maximum number of results in a single response. The default is 200 and the maximum is 1000."
+    ],
+    before: [
+      type: :string,
+      doc:
+        "Fetches the next paginated response before this element. This element is a cursor and is returned at the response of the previous page."
+    ],
+    after: [
+      type: :string,
+      doc:
+        "Fetches the next paginated response after this element. This element is a cursor and is returned at the response of the previous page."
+    ]
+  ]
+
+  @create_schema [
+    name: [type: :string, required: true],
+    hiddenOnUI: [type: :boolean, default: false],
+    customerRefId: [type: :string],
+    autoFuel: [type: :boolean, default: true]
+  ]
 
   @doc """
   Creates a new vault account with the requested name.
@@ -16,10 +42,10 @@ defmodule FireblocksSdk.Api.Vault do
   ])
   ```
 
-  Options:\n#{NimbleOptions.docs(Schema.vault_create_request())}
+  Options:\n#{NimbleOptions.docs(@create_schema)}
   """
   def create(vault, idempotentKey \\ "") do
-    {:ok, options} = NimbleOptions.validate(vault, Schema.vault_create_request())
+    {:ok, options} = NimbleOptions.validate(vault, @create_schema)
     params = options |> Enum.into(%{}) |> Jason.encode!()
     post!(@accounts_path, params, idempotentKey)
   end
@@ -53,6 +79,13 @@ defmodule FireblocksSdk.Api.Vault do
     post!("#{@accounts_path}/#{vault_id}/#{asset_id}/activate", "", idempotentKey)
   end
 
+  @set_customer_ref_id_schema [
+    vaultId: [type: :string, required: true],
+    assetId: [type: :string],
+    addressId: [type: :string],
+    customerRefId: [type: :string, required: true]
+  ]
+
   @doc """
   Assigns an AML/KYT customer reference ID for the vault account.
 
@@ -71,10 +104,10 @@ defmodule FireblocksSdk.Api.Vault do
   ])
   ```
 
-  Options:\n#{NimbleOptions.docs(Schema.vault_set_customer_ref_id_request())}
+  Options:\n#{NimbleOptions.docs(@set_customer_ref_id_schema)}
   """
   def set_customer_ref_id(reference, idempotentKey \\ "") do
-    {:ok, options} = NimbleOptions.validate(reference, Schema.vault_set_customer_ref_id_request())
+    {:ok, options} = NimbleOptions.validate(reference, @set_customer_ref_id_schema)
     vault_id = options[:vaultId]
     asset_id = options[:assetId]
     address_id = options[:addressId]
@@ -90,17 +123,28 @@ defmodule FireblocksSdk.Api.Vault do
     post!(path, params, idempotentKey)
   end
 
+  @set_auto_fuel_schema [
+    vaultId: [type: :string, required: true],
+    autoFuel: [type: :boolean, required: true, default: true]
+  ]
+
   @doc """
   Sets the autofueling property of the vault account to enabled or disabled.
 
-  Options:\n#{NimbleOptions.docs(Schema.vault_auto_fuel_request())}
+  Options:\n#{NimbleOptions.docs(@set_auto_fuel_schema)}
   """
   def set_auto_fuel(fuel, idempotentKey \\ "") do
-    {:ok, options} = NimbleOptions.validate(fuel, Schema.vault_auto_fuel_request())
+    {:ok, options} = NimbleOptions.validate(fuel, @set_auto_fuel_schema)
     vault_id = options[:vaultId]
     params = options |> Keyword.delete(:vaultId) |> Jason.encode!()
     post!("#{@accounts_path}/#{vault_id}/set_auto_fuel", params, idempotentKey)
   end
+
+  @create_wallet_schema [
+    vaultId: [type: :string, required: true],
+    assetId: [type: :string, required: true],
+    eosAccountName: [type: :string]
+  ]
 
   @doc """
   Creates a wallet for a specific asset in a vault account.
@@ -112,10 +156,10 @@ defmodule FireblocksSdk.Api.Vault do
   ])
   ```
 
-  Options:\n#{NimbleOptions.docs(Schema.vault_create_wallet_request())}
+  Options:\n#{NimbleOptions.docs(@create_wallet_schema)}
   """
   def create_wallet(wallet, idempotentKey \\ "") do
-    {:ok, options} = NimbleOptions.validate(wallet, Schema.vault_create_wallet_request())
+    {:ok, options} = NimbleOptions.validate(wallet, @create_wallet_schema)
     vault_id = options[:vaultId]
     asset_id = options[:assetId]
 
@@ -159,13 +203,23 @@ defmodule FireblocksSdk.Api.Vault do
     get!("#{@accounts_path}/#{vault_id}/#{asset_id}/unspent_inputs")
   end
 
+  @get_public_key_info_schema [
+    vaultId: [type: :string],
+    assetId: [type: :string],
+    addressId: [type: :string],
+    change: [type: :string],
+    derivationPath: [type: :string, required: true],
+    algorithm: [type: :string, required: true],
+    compressed: [type: :boolean]
+  ]
+
   @doc """
   Gets the public key information based on derivation path and signing algorithm.
 
-  Options:\n#{NimbleOptions.docs(Schema.vault_public_key_info_filter())}
+  Options:\n#{NimbleOptions.docs(@get_public_key_info_schema)}
   """
   def get_public_key_info(filter) do
-    {:ok, options} = NimbleOptions.validate(filter, Schema.vault_public_key_info_filter())
+    {:ok, options} = NimbleOptions.validate(filter, @get_public_key_info_schema)
     vault_id = options[:vaultId]
     asset_id = options[:assetId]
     address_id = options[:addressId]
@@ -191,13 +245,20 @@ defmodule FireblocksSdk.Api.Vault do
     get!("#{path}?#{query_string}")
   end
 
+  @update_address_description_schema [
+    vaultId: [type: :string, required: true],
+    assetId: [type: :string, required: true],
+    addressId: [type: :string, required: true],
+    description: [type: :string, default: ""]
+  ]
+
   @doc """
   Updates the description of an existing address of an asset in a vault account.
 
-  Options:\n#{NimbleOptions.docs(Schema.vault_address_description_request())}
+  Options:\n#{NimbleOptions.docs(@update_address_description_schema)}
   """
   def update_address_description(change, idempotentKey \\ "") do
-    {:ok, options} = NimbleOptions.validate(change, Schema.vault_address_description_request())
+    {:ok, options} = NimbleOptions.validate(change, @update_address_description_schema)
 
     vault_id = options[:vaultId]
     asset_id = options[:assetId]
@@ -217,6 +278,14 @@ defmodule FireblocksSdk.Api.Vault do
     )
   end
 
+  @list_schema [
+    namePrefix: [type: :string],
+    nameSuffix: [type: :string],
+    minAmountThreshold: [type: :non_neg_integer],
+    assetId: [type: :string],
+    orderBy: [type: {:in, [:asc, :desc]}, doc: "order by `:asc` or `:desc`"]
+  ] ++ @pagination
+
   @doc """
   Gets a list of vault accounts per page matching the given filter or path
 
@@ -228,10 +297,10 @@ defmodule FireblocksSdk.Api.Vault do
   ])
   ```
 
-  Supported options:\n#{NimbleOptions.docs(Schema.vault_listing_request())}
+  Supported options:\n#{NimbleOptions.docs(@list_schema)}
   """
   def list(listing) do
-    {:ok, params} = NimbleOptions.validate(listing, Schema.vault_listing_request())
+    {:ok, params} = NimbleOptions.validate(listing, @list_schema)
 
     query_string =
       params
@@ -270,6 +339,11 @@ defmodule FireblocksSdk.Api.Vault do
     post!("#{@accounts_path}/#{vault_id}/#{asset_id}/addresses", "", idempotentKey)
   end
 
+  @list_vault_asset_addresses_schema [
+    vaultAccountId: [type: :string, required: true],
+    assetId: [type: :string, required: true]
+  ] ++ @pagination
+
   @doc """
   Returns a paginated response of the addresses for a given vault account and asset.
 
@@ -281,10 +355,10 @@ defmodule FireblocksSdk.Api.Vault do
   ])
   ```
 
-  Options:\n#{NimbleOptions.docs(Schema.vault_asset_addresses_request())}
+  Options:\n#{NimbleOptions.docs(@list_vault_asset_addresses_schema)}
   """
   def list_vault_asset_addresses(options) do
-    {:ok, params} = NimbleOptions.validate(options, Schema.vault_asset_addresses_request())
+    {:ok, params} = NimbleOptions.validate(options, @list_vault_asset_addresses_schema)
     vaultId = params[:vaultAccountId]
     assetId = params[:assetId]
 
@@ -297,6 +371,11 @@ defmodule FireblocksSdk.Api.Vault do
     get!("#{@accounts_path}/#{vaultId}/#{assetId}/addresses_paginated?#{query_string}")
   end
 
+  @get_assets_balance_schema [
+    accountNamePrefix: [type: :string],
+    accountNameSuffix: [type: :string]
+  ]
+
   @doc """
   Gets the assets amount summary for all accounts or filtered accounts.
 
@@ -306,12 +385,24 @@ defmodule FireblocksSdk.Api.Vault do
   ])
   ```
 
-  Supported options:\n#{NimbleOptions.docs(Schema.vault_balance_filter())}
+  Supported options:\n#{NimbleOptions.docs(@get_assets_balance_schema)}
   """
   def get_assets_balance(options) do
-    {:ok, params} = NimbleOptions.validate(options, Schema.vault_balance_filter())
+    {:ok, params} = NimbleOptions.validate(options, @get_assets_balance_schema)
     get!("#{@base_path}/assets?#{URI.encode_query(params)}")
   end
+
+  @get_asset_wallets_schema [
+    totalAmountLargerThan: [
+      type: {:or, [:non_neg_integer, :float]},
+      doc: "When specified, only asset wallets with total balance larger than this amount are returned."
+    ],
+    assetId: [
+      type: :string,
+      doc: "When specified, only asset wallets cross vault accounts that have this asset ID are returned."
+    ],
+    orderBy: [type: {:in, [:asc, :desc]}, doc: "order by `:asc` or `:desc`"]
+  ] ++ @pagination
 
   @doc """
   Gets all asset wallets at all of the vault accounts in your workspace. An asset wallet is an asset at a vault account. This method allows fast traversal of all account balances.
@@ -324,10 +415,10 @@ defmodule FireblocksSdk.Api.Vault do
   ])
   ```
 
-  Supported options:\n#{NimbleOptions.docs(Schema.vault_asset_wallets())}
+  Supported options:\n#{NimbleOptions.docs(@get_asset_wallets_schema)}
   """
   def get_asset_wallets(options) do
-    {:ok, params} = NimbleOptions.validate(options, Schema.vault_asset_wallets())
+    {:ok, params} = NimbleOptions.validate(options, @get_asset_wallets_schema)
     get!("#{@base_path}/asset_wallets?#{URI.encode_query(params)}")
   end
 end

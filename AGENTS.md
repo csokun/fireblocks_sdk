@@ -23,17 +23,19 @@ This is an Elixir SDK for the Fireblocks API. It is generated/maintained against
 ### 2. Implementation Rules
 - **Module Structure:** Mirror the API `tags` or path hierarchy (e.g., `FireblocksSdk.Vault.Assets`).
 - **Validation & Types (`NimbleOptions`):**
-  - **Colocation:** Define `@options_schema` using `NimbleOptions` directly within the module where the function resides.
-  - **Shared Schemas:** If a request/response body or complex query param set is reused across multiple modules, define it in `FireblocksSdk.Schema` and import/reference it.
+  - **Colocation:** Define a `@<function>_schema` module attribute using `NimbleOptions` directly above the `@doc` of the function that uses it. For example, `create/2` → `@create_schema`, `list/1` → `@list_schema`, `update_settings/2` → `@update_settings_schema`.
+  - **Naming convention:** Always use the `@<function>_schema` naming pattern. Never use a generic `@options_schema` or an unrelated name, and never reuse the same attribute name for two different functions in the same module (silent shadowing).
+  - **Shared Schemas:** If a schema is genuinely reused across **more than one module**, define it as a public function in `FireblocksSdk.Schema` and call it from each module. Do **not** duplicate it inline — keep `FireblocksSdk.Schema` as the single source of truth for cross-module schemas.
+  - **Shared sub-fields within a module:** If multiple schemas in the same module share a common set of fields (e.g., pagination parameters), define a private `@<name>` module attribute (e.g., `@pagination`) at the top of the module and compose schemas with `++ @pagination`.
   - **Mapping:**
-    - Map Swagger `required` fields to `NimbleOptions.required/1`.
+    - Map Swagger `required` fields to `required: true` in NimbleOptions.
     - Map Swagger types (`string`, `integer`, `boolean`) to corresponding Elixir types in `NimbleOptions`.
-    - Use `NimbleOptions.validate!/2` at the start of public functions to enforce contract compliance.
+    - Use `NimbleOptions.validate/2` at the start of public functions to enforce contract compliance.
 - **Function Signatures:**
   - **Naming:** Derive from `operationId` (preferred) or path segments, converted to `snake_case`.
   - **Arguments:**
     - Positional args for required path parameters.
-    - Single keyword list arg for optional query params and body data (validated against `@options_schema`).
+    - Single keyword list arg for optional query params and body data (validated against the function's `@<function>_schema`).
 - **Documentation:**
   - **Sync:** Copy `summary` and `description` from Swagger into `@doc`.
   - **Specs:** Include `@spec` reflecting the validated input (keyword list) and the decoded response struct/map.

@@ -9,13 +9,13 @@ defmodule FireblocksSdk.Api.Asset do
     symbol: [type: :string, required: true]
   ]
 
-  @update_asset_price_schema [
+  @set_price_schema [
     assetId: [type: :string, required: true],
     currency: [type: :string, required: true],
     price: [type: {:or, [:integer, :float]}, required: true]
   ]
 
-  @list_assets [
+  @list_schema [
     blockchainId: [type: :string, doc: "Blockchain id of the assets"],
     assetClass: [type: {:in, [:native, :ft, :fiat, :nft, :sft]}],
     symbol: [type: :string],
@@ -62,10 +62,10 @@ defmodule FireblocksSdk.Api.Asset do
     ])
   ```
 
-  Options: \n#{NimbleOptions.docs(@update_asset_price_schema)}
+  Options: \n#{NimbleOptions.docs(@set_price_schema)}
   """
   def set_price(opts, idempotent_key \\ "") do
-    {:ok, options} = NimbleOptions.validate(opts, @update_asset_price_schema)
+    {:ok, options} = NimbleOptions.validate(opts, @set_price_schema)
     assetId = Keyword.get(opts, :assetId)
 
     params =
@@ -80,10 +80,10 @@ defmodule FireblocksSdk.Api.Asset do
   @doc """
   Retrieves all assets supported by Fireblocks in your workspace, providing extended information and enhanced performance compared to the legacy supported_assets endpoint.
 
-  Options: \n#{NimbleOptions.docs(@list_assets)}
+  Options: \n#{NimbleOptions.docs(@list_schema)}
   """
   def list(opt \\ []) do
-    {:ok, params} = NimbleOptions.validate(opt, @list_assets)
+    {:ok, params} = NimbleOptions.validate(opt, @list_schema)
 
     query_string =
       params

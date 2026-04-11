@@ -1,17 +1,21 @@
 defmodule FireblocksSdk.Api.Tokenization do
-  alias FireblocksSdk.Schema
-
   import FireblocksSdk.Request
 
   @base_path "/v1/tokenization"
 
+  @list_schema [
+    pageCursor: [type: :string],
+    pageSize: [type: :non_neg_integer, default: 10],
+    status: [type: :string, default: "COMPLETED"]
+  ]
+
   @doc """
   Return all linked tokens (paginated)
 
-  Options:\n#{NimbleOptions.docs(Schema.tokenization_list_request())}
+  Options:\n#{NimbleOptions.docs(@list_schema)}
   """
   def list(filter) do
-    {:ok, params} = NimbleOptions.validate(filter, Schema.tokenization_list_request())
+    {:ok, params} = NimbleOptions.validate(filter, @list_schema)
     query = params |> URI.encode_query()
     get!("#{@base_path}/tokens?#{query}")
   end
@@ -23,20 +27,35 @@ defmodule FireblocksSdk.Api.Tokenization do
     get!("#{@base_path}/tokens/#{token_id}")
   end
 
+  @create_schema [
+    blockchainId: [type: :string],
+    assetId: [type: :string],
+    vaultAccountId: [
+      type: :string,
+      required: true,
+      doc: "The id of the vault account that initiated the request to issue the token"
+    ],
+    createParams: [type: :any, required: true],
+    displayName: [type: :string],
+    useGasless: [type: :boolean],
+    fee: [type: :string],
+    feeLevel: [type: :string]
+  ]
+
   @doc """
   Facilitates the creation of a new token, supporting both EVM-based and Stellar/Ripple platforms.
   For EVM, it deploys the corresponding contract template to the blockchain and links the token to the workspace.
   For Stellar/Ripple, it links a newly created token directly to the workspace without deploying a contract.
   Returns the token link with status "PENDING" until the token is deployed or "SUCCESS" if no deployment is needed.
 
-  Options:\n#{NimbleOptions.docs(Schema.tokenization_create_request())}
+  Options:\n#{NimbleOptions.docs(@create_schema)}
   """
   def create(params, idempotentKey \\ "") do
-    {:ok, params} = NimbleOptions.validate(params, Schema.tokenization_create_request())
+    {:ok, params} = NimbleOptions.validate(params, @create_schema)
     post!("#{@base_path}/tokens", params, idempotentKey)
   end
 
-  @tokenization_link_request [
+  @link_schema [
     type: [
       type: {:in, [:fungible, :non_fungible_token, :token_utility, :token_extension]},
       required: true,
@@ -59,10 +78,10 @@ defmodule FireblocksSdk.Api.Tokenization do
   @doc """
   Link an existing token to the workspace.
 
-  Options:\n#{NimbleOptions.docs(@tokenization_link_request)}
+  Options:\n#{NimbleOptions.docs(@link_schema)}
   """
   def link(link_req, idempotentKey \\ "") do
-    {:ok, params} = NimbleOptions.validate(link_req, @tokenization_link_request)
+    {:ok, params} = NimbleOptions.validate(link_req, @link_schema)
 
     params =
       params
@@ -85,7 +104,7 @@ defmodule FireblocksSdk.Api.Tokenization do
     get!("#{@base_path}/tokens/link/#{link_id}")
   end
 
-  @get_deployable_address_request [
+  @get_deterministic_address_schema [
     chainDescriptor: [
       type: :string,
       required: true,
@@ -114,10 +133,10 @@ defmodule FireblocksSdk.Api.Tokenization do
   @doc """
   Get a deterministic address for contract deployment. The address is derived from the contract's bytecode and provided salt. This endpoint is used to get the address of a contract that will be deployed in the future.
 
-  Options:\n#{NimbleOptions.docs(@get_deployable_address_request)}
+  Options:\n#{NimbleOptions.docs(@get_deterministic_address_schema)}
   """
   def get_deterministic_address(params, idempotentKey \\ "") do
-    {:ok, params} = NimbleOptions.validate(params, @get_deployable_address_request)
+    {:ok, params} = NimbleOptions.validate(params, @get_deterministic_address_schema)
     post!("#{@base_path}/tokens/deterministic_address", params, idempotentKey)
   end
 

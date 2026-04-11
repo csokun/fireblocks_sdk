@@ -1,5 +1,4 @@
 defmodule FireblocksSdk.Api.Management do
-  alias FireblocksSdk.Schema
   import FireblocksSdk.Request
 
   @base_path "/v1/management"
@@ -7,6 +6,52 @@ defmodule FireblocksSdk.Api.Management do
   # ---------------------------------------------------------------------------
   # API Users
   # ---------------------------------------------------------------------------
+
+  @create_api_user_schema [
+    role: [type: :string, required: true],
+    name: [type: :string, required: true],
+    publicKey: [type: :string],
+    coSignerSetupIsComplete: [type: :boolean]
+  ]
+
+  @create_console_user_schema [
+    role: [type: :string, required: true],
+    name: [type: :string, required: true],
+    email: [type: :string, required: true]
+  ]
+
+  @get_audit_logs_schema [
+    timePeriod: [
+      type: {:in, [:day, :week]},
+      doc: "The last time period to fetch. One of `:day`, `:week`"
+    ],
+    cursor: [
+      type: :string,
+      doc: "Pagination cursor - the next id to start from"
+    ]
+  ]
+
+  @create_user_group_schema [
+    groupName: [
+      type: :string,
+      doc: "The user group name"
+    ],
+    memberIds: [
+      type: {:list, :string},
+      doc: "Array of user IDs to include in the group"
+    ]
+  ]
+
+  @update_user_group_schema [
+    groupName: [
+      type: :string,
+      doc: "The user group name"
+    ],
+    memberIds: [
+      type: {:list, :string},
+      doc: "Array of user IDs to include in the group"
+    ]
+  ]
 
   @doc """
   Returns all API users in the current tenant.
@@ -18,10 +63,10 @@ defmodule FireblocksSdk.Api.Management do
   @doc """
   Creates a new API user. Admin permission is required.
 
-  Options:\n#{NimbleOptions.docs(Schema.create_api_user_request())}
+  Options:\n#{NimbleOptions.docs(@create_api_user_schema)}
   """
   def create_api_user(params) do
-    {:ok, options} = NimbleOptions.validate(params, Schema.create_api_user_request())
+    {:ok, options} = NimbleOptions.validate(params, @create_api_user_schema)
     body = options |> Enum.into(%{}) |> Jason.encode!()
     post!("#{@base_path}/api_users", body)
   end
@@ -49,10 +94,10 @@ defmodule FireblocksSdk.Api.Management do
   @doc """
   Creates a new console user. Admin permission is required.
 
-  Options:\n#{NimbleOptions.docs(Schema.create_console_user_request())}
+  Options:\n#{NimbleOptions.docs(@create_console_user_schema)}
   """
   def create_console_user(params) do
-    {:ok, options} = NimbleOptions.validate(params, Schema.create_console_user_request())
+    {:ok, options} = NimbleOptions.validate(params, @create_console_user_schema)
     body = options |> Enum.into(%{}) |> Jason.encode!()
     post!("#{@base_path}/users", body)
   end
@@ -80,10 +125,10 @@ defmodule FireblocksSdk.Api.Management do
   @doc """
   Creates a new user group.
 
-  Options:\n#{NimbleOptions.docs(Schema.user_group_create_request())}
+  Options:\n#{NimbleOptions.docs(@create_user_group_schema)}
   """
   def create_user_group(params) do
-    {:ok, options} = NimbleOptions.validate(params, Schema.user_group_create_request())
+    {:ok, options} = NimbleOptions.validate(params, @create_user_group_schema)
     body = options |> Enum.into(%{}) |> Jason.encode!()
     post!("#{@base_path}/user_groups", body)
   end
@@ -102,10 +147,10 @@ defmodule FireblocksSdk.Api.Management do
 
   - `group_id`: The ID of the user group to update.
 
-  Options:\n#{NimbleOptions.docs(Schema.user_group_update_request())}
+  Options:\n#{NimbleOptions.docs(@update_user_group_schema)}
   """
   def update_user_group(group_id, params) when is_binary(group_id) do
-    {:ok, options} = NimbleOptions.validate(params, Schema.user_group_update_request())
+    {:ok, options} = NimbleOptions.validate(params, @update_user_group_schema)
     body = options |> Enum.into(%{}) |> Jason.encode!()
     put!("#{@base_path}/user_groups/#{group_id}", body)
   end
@@ -126,10 +171,10 @@ defmodule FireblocksSdk.Api.Management do
   @doc """
   Returns audit logs for the last Day or Week.
 
-  Options:\n#{NimbleOptions.docs(Schema.management_audit_logs_request())}
+  Options:\n#{NimbleOptions.docs(@get_audit_logs_schema)}
   """
   def get_audit_logs(opts \\ []) do
-    {:ok, params} = NimbleOptions.validate(opts, Schema.management_audit_logs_request())
+    {:ok, params} = NimbleOptions.validate(opts, @get_audit_logs_schema)
 
     query_string =
       params

@@ -7,7 +7,7 @@ defmodule FireblocksSdk.Api.Webhook do
 
   @base_path "/v1/webhooks"
 
-  @webhook_v2_create_request [
+  @create_schema [
     url: [type: :string, required: true],
     description: [type: :string],
     events: [type: {:list, :string}, required: true],
@@ -19,15 +19,15 @@ defmodule FireblocksSdk.Api.Webhook do
 
   **Endpoint Permission:** Owner, Admin, Non-Signing Admin.
 
-  Options:\n#{NimbleOptions.docs(@webhook_v2_create_request)}
+  Options:\n#{NimbleOptions.docs(@create_schema)}
   """
   def create(webhook, idempotentKey \\ "") do
-    {:ok, options} = NimbleOptions.validate(webhook, @webhook_v2_create_request)
+    {:ok, options} = NimbleOptions.validate(webhook, @create_schema)
     params = options |> Jason.encode!()
     post!("#{@base_path}", params, idempotentKey)
   end
 
-  @webhook_v2_list_request [
+  @list_schema [
     order: [type: {:in, [:asc, :desc]}, default: :desc, doc: "available value: `:asc`, `:desc`"],
     pageCursor: [type: :string],
     pageSize: [type: :integer, default: 10]
@@ -36,10 +36,10 @@ defmodule FireblocksSdk.Api.Webhook do
   @doc """
   Get all webhooks (paginated)
 
-  Options:\n#{NimbleOptions.docs(@webhook_v2_list_request)}
+  Options:\n#{NimbleOptions.docs(@list_schema)}
   """
   def list(webhook) do
-    {:ok, options} = NimbleOptions.validate(webhook, @webhook_v2_list_request)
+    {:ok, options} = NimbleOptions.validate(webhook, @list_schema)
 
     query_string =
       options
@@ -56,7 +56,7 @@ defmodule FireblocksSdk.Api.Webhook do
     get!("#{@base_path}/#{webhook_id}")
   end
 
-  @webhook_v2_update_request [
+  @update_schema [
     webhookId: [type: :string, required: true, doc: "The ID of the webhook to update"],
     url: [type: :string],
     description: [type: :string],
@@ -69,10 +69,10 @@ defmodule FireblocksSdk.Api.Webhook do
 
   **Endpoint Permission:** Owner, Admin, Non-Signing Admin.
 
-  Options:\n#{NimbleOptions.docs(@webhook_v2_update_request)}
+  Options:\n#{NimbleOptions.docs(@update_schema)}
   """
   def update(webhook, idempotentKey \\ "") do
-    {:ok, options} = NimbleOptions.validate(webhook, @webhook_v2_update_request)
+    {:ok, options} = NimbleOptions.validate(webhook, @update_schema)
     webhook_id = options[:webhookId]
     params = options |> Keyword.delete(:webhookId) |> Jason.encode!()
     patch!("#{@base_path}/#{webhook_id}", params, idempotentKey)
@@ -87,7 +87,7 @@ defmodule FireblocksSdk.Api.Webhook do
     delete!("#{@base_path}/#{webhook_id}")
   end
 
-  @webhook_v2_notifications_request [
+  @get_notifications_schema [
     webhookId: [type: :string, required: true],
     sortBy: [
       type: {:in, [:id, :createdAt, :updatedAt, :status, :eventType, :resourceId]},
@@ -120,6 +120,7 @@ defmodule FireblocksSdk.Api.Webhook do
     ],
     resourceId: [type: :string]
   ]
+
   @doc """
   Get all notifications by webhook id (paginated)
 
@@ -134,10 +135,10 @@ defmodule FireblocksSdk.Api.Webhook do
   ])
   ```
 
-  Options:\n#{NimbleOptions.docs(@webhook_v2_notifications_request)}
+  Options:\n#{NimbleOptions.docs(@get_notifications_schema)}
   """
   def get_notifications(webhook) do
-    {:ok, options} = NimbleOptions.validate(webhook, @webhook_v2_notifications_request)
+    {:ok, options} = NimbleOptions.validate(webhook, @get_notifications_schema)
 
     webhook_id = options[:webhookId]
 
@@ -151,7 +152,7 @@ defmodule FireblocksSdk.Api.Webhook do
     get!("#{@base_path}/#{webhook_id}/notifications?#{query_string}")
   end
 
-  @webhook_v2_get_notification_request [
+  @get_notification_schema [
     includeData: [
       type: :boolean,
       default: false,
@@ -164,10 +165,10 @@ defmodule FireblocksSdk.Api.Webhook do
   @doc """
   Retrieve a specific notification by its id.
 
-  Options:\n#{NimbleOptions.docs(@webhook_v2_get_notification_request)}
+  Options:\n#{NimbleOptions.docs(@get_notification_schema)}
   """
   def get_notification(notification \\ []) do
-    {:ok, options} = NimbleOptions.validate(notification, @webhook_v2_get_notification_request)
+    {:ok, options} = NimbleOptions.validate(notification, @get_notification_schema)
 
     webhook_id = options[:webhookId]
     notification_id = options[:notificationId]
@@ -181,7 +182,7 @@ defmodule FireblocksSdk.Api.Webhook do
     get!("#{@base_path}/#{webhook_id}/notifications/#{notification_id}?#{query_string}")
   end
 
-  @webhook_v2_get_notification_attempts_request [
+  @get_notification_attempts_schema [
     webhookId: [type: :string, required: true, doc: "The ID of the webhook to fetch"],
     notificationId: [type: :string, required: true, doc: "The ID of the notification to fetch"],
     pageCursor: [type: :string],
@@ -191,11 +192,11 @@ defmodule FireblocksSdk.Api.Webhook do
   @doc """
   Get notification attempts by notification id
 
-  Options:\n#{NimbleOptions.docs(@webhook_v2_get_notification_attempts_request)}
+  Options:\n#{NimbleOptions.docs(@get_notification_attempts_schema)}
   """
   def get_notification_attempts(notification \\ []) do
     {:ok, options} =
-      NimbleOptions.validate(notification, @webhook_v2_get_notification_attempts_request)
+      NimbleOptions.validate(notification, @get_notification_attempts_schema)
 
     webhook_id = options[:webhookId]
     notification_id = options[:notificationId]
@@ -209,7 +210,7 @@ defmodule FireblocksSdk.Api.Webhook do
     get!("#{@base_path}/#{webhook_id}/notifications/#{notification_id}/attempts?#{query_string}")
   end
 
-  @webhook_v2_resend_notification_request [
+  @resend_schema [
     webhookId: [
       type: :string,
       required: true,
@@ -223,10 +224,10 @@ defmodule FireblocksSdk.Api.Webhook do
 
   **Endpoint Permission:** Owner, Admin, Non-Signing Admin, Editor, Signer.
 
-  Options:\n#{NimbleOptions.docs(@webhook_v2_resend_notification_request)}
+  Options:\n#{NimbleOptions.docs(@resend_schema)}
   """
   def resend(notification \\ [], idempotentKey \\ "") do
-    {:ok, options} = NimbleOptions.validate(notification, @webhook_v2_resend_notification_request)
+    {:ok, options} = NimbleOptions.validate(notification, @resend_schema)
 
     webhook_id = options[:webhookId]
     notification_id = options[:notificationId]
@@ -238,7 +239,7 @@ defmodule FireblocksSdk.Api.Webhook do
     )
   end
 
-  @webhook_v2_resend_by_resource_request [
+  @resend_by_resource_schema [
     webhookId: [
       type: :string,
       required: true,
@@ -261,10 +262,10 @@ defmodule FireblocksSdk.Api.Webhook do
 
   **Endpoint Permission:** Owner, Admin, Non-Signing Admin, Editor, Signer.
 
-  Options:\n#{NimbleOptions.docs(@webhook_v2_resend_by_resource_request)}
+  Options:\n#{NimbleOptions.docs(@resend_by_resource_schema)}
   """
   def resend_by_resource(notification \\ [], idempotentKey \\ "") do
-    {:ok, options} = NimbleOptions.validate(notification, @webhook_v2_resend_by_resource_request)
+    {:ok, options} = NimbleOptions.validate(notification, @resend_by_resource_schema)
 
     webhook_id = options[:webhookId]
 
@@ -281,7 +282,7 @@ defmodule FireblocksSdk.Api.Webhook do
     )
   end
 
-  @webhook_v2_resend_failed_request [
+  @resend_failed_schema [
     webhookId: [
       type: :string,
       required: true,
@@ -305,10 +306,10 @@ defmodule FireblocksSdk.Api.Webhook do
 
   **Endpoint Permission:** Owner, Admin, Non-Signing Admin, Editor, Signer.
 
-  Options:\n#{NimbleOptions.docs(@webhook_v2_resend_failed_request)}
+  Options:\n#{NimbleOptions.docs(@resend_failed_schema)}
   """
   def resend_failed(notification \\ [], idempotentKey \\ "") do
-    {:ok, options} = NimbleOptions.validate(notification, @webhook_v2_resend_failed_request)
+    {:ok, options} = NimbleOptions.validate(notification, @resend_failed_schema)
 
     webhook_id = options[:webhookId]
 

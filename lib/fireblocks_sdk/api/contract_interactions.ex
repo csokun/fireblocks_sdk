@@ -3,7 +3,7 @@ defmodule FireblocksSdk.Api.ContractInteractions do
 
   @interactions "/v1/contract_interactions/base_asset_id"
 
-  @interaction_functions [
+  @get_functions_schema [
     baseAssetId: [type: :string, required: true, doc: "Base assetId e.g ETH, ETH_TEST5"],
     contractAddress: [type: :string, required: true]
   ]
@@ -11,28 +11,29 @@ defmodule FireblocksSdk.Api.ContractInteractions do
   @doc """
   Return deployed contract's ABI by blockchain native asset id and contract address
 
-  Options:\n#{NimbleOptions.docs(@interaction_functions)}
+  Options:\n#{NimbleOptions.docs(@get_functions_schema)}
   """
   def get_functions(options) do
-    {:ok, params} = NimbleOptions.validate(options, @interaction_functions)
+    {:ok, params} = NimbleOptions.validate(options, @get_functions_schema)
 
     get!(
       "#{@interactions}/#{params[:baseAssetId]}/contract_address/#{params[:contractAddress]}/functions"
     )
   end
 
-  @interaction_read [
+  @read_schema [
     baseAssetId: [type: :string, required: true, doc: "Base assetId e.g ETH, ETH_TEST5"],
     contractAddress: [type: :string, required: true],
     abiFunction: [type: :map]
   ]
+
   @doc """
   Return deployed contract's ABI by blockchain native asset id and contract address
 
-  Options:\n#{NimbleOptions.docs(@interaction_read)}
+  Options:\n#{NimbleOptions.docs(@read_schema)}
   """
   def read(options, idempotentKey \\ "") do
-    {:ok, params} = NimbleOptions.validate(options, @interaction_read)
+    {:ok, params} = NimbleOptions.validate(options, @read_schema)
     baseAssetId = params[:baseAssetId]
     contractAddress = params[:contractAddress]
 
@@ -49,7 +50,7 @@ defmodule FireblocksSdk.Api.ContractInteractions do
     )
   end
 
-  @interaction_write [
+  @write_schema [
     baseAssetId: [type: :string, required: true, doc: "Base assetId e.g ETH, ETH_TEST5"],
     contractAddress: [type: :string, required: true],
     vaultId: [
@@ -81,13 +82,14 @@ defmodule FireblocksSdk.Api.ContractInteractions do
         "External id that can be used to identify the transaction in your system. The unique identifier of the transaction outside of Fireblocks with max length of 255 characters"
     ]
   ]
+
   @doc """
   Call a write function on a deployed contract by blockchain native asset id and contract address. This creates an onchain transaction, thus it is an async operation. It returns a transaction id that can be polled for status check
 
-  Options:\n#{NimbleOptions.docs(@interaction_write)}
+  Options:\n#{NimbleOptions.docs(@write_schema)}
   """
   def write(options, idempotentKey \\ "") do
-    {:ok, params} = NimbleOptions.validate(options, @interaction_write)
+    {:ok, params} = NimbleOptions.validate(options, @write_schema)
     baseAssetId = params[:baseAssetId]
     contractAddress = params[:contractAddress]
 
@@ -105,7 +107,7 @@ defmodule FireblocksSdk.Api.ContractInteractions do
     )
   end
 
-  @interaction_receipt [
+  @get_transaction_receipt_schema [
     baseAssetId: [type: :string, required: true, doc: "Base assetId e.g ETH, ETH_TEST5"],
     txHash: [type: :string, required: true, doc: "Transaction hash"]
   ]
@@ -113,15 +115,15 @@ defmodule FireblocksSdk.Api.ContractInteractions do
   @doc """
   Retrieve the transaction receipt by blockchain native asset ID and transaction hash
 
-  Options:\n#{NimbleOptions.docs(@interaction_receipt)}
+  Options:\n#{NimbleOptions.docs(@get_transaction_receipt_schema)}
   """
   def get_transaction_receipt(receipt) do
-    {:ok, params} = NimbleOptions.validate(receipt, @interaction_receipt)
+    {:ok, params} = NimbleOptions.validate(receipt, @get_transaction_receipt_schema)
 
     get!("#{@interactions}/#{params[:baseAssetId]}/tx_hash/#{params[:txHash]}/receipt")
   end
 
-  @interaction_decode [
+  @decode_schema [
     baseAssetId: [type: :string, required: true, doc: "Base assetId e.g ETH, ETH_TEST5"],
     contractAddress: [type: :string, required: true],
     dataType: [
@@ -139,10 +141,10 @@ defmodule FireblocksSdk.Api.ContractInteractions do
   @doc """
   Decode a function call data, error, or event log from a deployed contract by blockchain native asset id and contract address.
 
-  Options:\n#{NimbleOptions.docs(@interaction_decode)}
+  Options:\n#{NimbleOptions.docs(@decode_schema)}
   """
   def decode(options, idempotentKey \\ "") do
-    {:ok, params} = NimbleOptions.validate(options, @interaction_decode)
+    {:ok, params} = NimbleOptions.validate(options, @decode_schema)
     baseAssetId = params[:baseAssetId]
     contractAddress = params[:contractAddress]
 

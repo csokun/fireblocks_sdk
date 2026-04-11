@@ -72,7 +72,7 @@ defmodule FireblocksSdk.Api.InternalWallet do
   @doc """
   Add asset to internal wallet.
 
-  Options:\n#{NimbleOptions.docs(Schema.wallet_set_customer_ref_id_request())}
+  Options:\n#{NimbleOptions.docs(Schema.wallet_add_asset_request())}
   """
   def add_asset(asset_info, idempotentKey \\ "") do
     {:ok, options} = NimbleOptions.validate(asset_info, Schema.wallet_add_asset_request())

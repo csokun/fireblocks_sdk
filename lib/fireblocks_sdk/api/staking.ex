@@ -1,8 +1,90 @@
 defmodule FireblocksSdk.Api.Staking do
   import FireblocksSdk.Request
-  alias FireblocksSdk.Schema
 
   @base_path "/v1/staking"
+
+  @fee_level [:high, :medium, :low]
+
+  @stake_schema [
+    vaultAccountId: [
+      type: :string,
+      required: true,
+      doc: "The source vault account to stake from"
+    ],
+    chainDescriptor: [type: :string, required: true],
+    providerId: [
+      type: :string,
+      required: true,
+      doc: "The unique identifier of the staking provider"
+    ],
+    stakeAmount: [type: :string, required: true, doc: "Amount of tokens to stake"],
+    fee: [type: :string],
+    feeLevel: [type: {:in, @fee_level}],
+    txNote: [type: :string, required: false]
+  ]
+
+  @unstake_schema [
+    id: [type: :string, required: true, doc: "id of position to unstake"],
+    chainDescriptor: [type: :string, required: true],
+    fee: [type: :string],
+    feeLevel: [type: {:in, @fee_level}],
+    txNote: [type: :string, required: false],
+    amount: [
+      type: :string,
+      doc:
+        "The number of tokens to unstake. This optional field is applicable only for liquid staking and allows for a partial unstake of the position. If not provided, the entire position will be unstaked by default."
+    ]
+  ]
+
+  @withdraw_schema [
+    id: [type: :string, required: true, doc: "id of position to withdraw"],
+    chainDescriptor: [type: :string, required: true],
+    fee: [type: :string],
+    feeLevel: [type: {:in, @fee_level}],
+    txNote: [type: :string, required: false]
+  ]
+
+  @claim_reawards_schema [
+    id: [type: :string, required: true, doc: "id of position to claim rewards from"],
+    chainDescriptor: [type: :string, required: true],
+    fee: [type: :string],
+    feeLevel: [type: {:in, @fee_level}],
+    txNote: [type: :string, required: false]
+  ]
+
+  @split_schema [
+    id: [type: :string, required: true, doc: "id of position to split"],
+    chainDescriptor: [type: {:in, ["SOL", "SOL_TEST"]}, required: true],
+    fee: [type: :string],
+    feeLevel: [type: {:in, @fee_level}],
+    txNote: [
+      type: :string,
+      required: false,
+      doc: "The note to associate with the transactions."
+    ],
+    amount: [
+      type: :string,
+      required: true,
+      doc: "Amount of tokens to be transferred to the new stake account."
+    ]
+  ]
+
+  @merge_schema [
+    chainDescriptor: [type: {:in, ["SOL", "SOL_TEST"]}, required: true],
+    sourceId: [type: :string, required: true, doc: "Id of the source position to merge from"],
+    destinationId: [
+      type: :string,
+      required: true,
+      doc: "Id of the destination position to merge into"
+    ],
+    fee: [type: :string],
+    feeLevel: [type: {:in, @fee_level}],
+    txNote: [
+      type: :string,
+      required: false,
+      doc: "The note to associate with the transactions."
+    ]
+  ]
 
   @doc """
   List staking supported chains
@@ -96,10 +178,10 @@ defmodule FireblocksSdk.Api.Staking do
   ])
   ```
 
-  Options:\n#{NimbleOptions.docs(Schema.staking_stake_request())}
+  Options:\n#{NimbleOptions.docs(@stake_schema)}
   """
   def stake(staking, idempotentKey \\ "") do
-    {:ok, options} = NimbleOptions.validate(staking, Schema.staking_stake_request())
+    {:ok, options} = NimbleOptions.validate(staking, @stake_schema)
 
     chain_descriptor = options[:chainDescriptor]
     params = options |> Keyword.delete(:chainDescriptor) |> Jason.encode!()
@@ -123,10 +205,10 @@ defmodule FireblocksSdk.Api.Staking do
   ])
   ```
 
-  Options:\n#{NimbleOptions.docs(Schema.staking_unstake_request())}
+  Options:\n#{NimbleOptions.docs(@unstake_schema)}
   """
   def unstake(unstaking, idempotentKey \\ "") do
-    {:ok, options} = NimbleOptions.validate(unstaking, Schema.staking_unstake_request())
+    {:ok, options} = NimbleOptions.validate(unstaking, @unstake_schema)
 
     chain_descriptor = options[:chainDescriptor]
     params = options |> Keyword.delete(:chainDescriptor) |> Jason.encode!()
@@ -150,10 +232,10 @@ defmodule FireblocksSdk.Api.Staking do
   ])
   ```
 
-  Options:\n#{NimbleOptions.docs(Schema.staking_withdraw_request())}
+  Options:\n#{NimbleOptions.docs(@withdraw_schema)}
   """
   def withdraw(withdrawal, idempotentKey \\ "") do
-    {:ok, options} = NimbleOptions.validate(withdrawal, Schema.staking_withdraw_request())
+    {:ok, options} = NimbleOptions.validate(withdrawal, @withdraw_schema)
 
     chain_descriptor = options[:chainDescriptor]
     params = options |> Keyword.delete(:chainDescriptor) |> Jason.encode!()
@@ -177,10 +259,10 @@ defmodule FireblocksSdk.Api.Staking do
   ])
   ```
 
-  Options:\n#{NimbleOptions.docs(Schema.staking_claim_rewards_request())}
+  Options:\n#{NimbleOptions.docs(@claim_reawards_schema)}
   """
   def claim_reawards(claim_request, idempotentKey \\ "") do
-    {:ok, options} = NimbleOptions.validate(claim_request, Schema.staking_claim_rewards_request())
+    {:ok, options} = NimbleOptions.validate(claim_request, @claim_reawards_schema)
 
     chain_descriptor = options[:chainDescriptor]
     params = options |> Keyword.delete(:chainDescriptor) |> Jason.encode!()
@@ -205,10 +287,10 @@ defmodule FireblocksSdk.Api.Staking do
   ])
   ```
 
-  Options:\n#{NimbleOptions.docs(Schema.staking_split_request())}
+  Options:\n#{NimbleOptions.docs(@split_schema)}
   """
   def split(split_request, idempotentKey \\ "") do
-    {:ok, options} = NimbleOptions.validate(split_request, Schema.staking_split_request())
+    {:ok, options} = NimbleOptions.validate(split_request, @split_schema)
 
     chain_descriptor = options[:chainDescriptor]
     params = options |> Keyword.delete(:chainDescriptor) |> Jason.encode!()
@@ -232,10 +314,10 @@ defmodule FireblocksSdk.Api.Staking do
   ])
   ```
 
-  Options:\n#{NimbleOptions.docs(Schema.staking_merge_request())}
+  Options:\n#{NimbleOptions.docs(@merge_schema)}
   """
   def merge(merge_request, idempotentKey \\ "") do
-    {:ok, options} = NimbleOptions.validate(merge_request, Schema.staking_merge_request())
+    {:ok, options} = NimbleOptions.validate(merge_request, @merge_schema)
 
     chain_descriptor = options[:chainDescriptor]
     params = options |> Keyword.delete(:chainDescriptor) |> Jason.encode!()
