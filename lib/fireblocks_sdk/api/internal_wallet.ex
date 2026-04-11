@@ -45,7 +45,7 @@ defmodule FireblocksSdk.Api.InternalWallet do
   """
   def get_wallet_assets(wallet_id, page_size \\ 50, page_cusor \\ "") do
     query =
-      %{pageSize: page_size, pageCusor: page_cusor}
+      %{pageSize: page_size, pageCursor: page_cusor}
       |> URI.encode_query()
 
     get!("#{@base_path}/#{wallet_id}/assets?#{query}")

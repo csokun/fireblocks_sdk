@@ -6,12 +6,34 @@ defmodule FireblocksSdk.Api.Transaction do
   @base_path "/v1/transactions"
 
   @doc """
-  Gets the estimated required fee for an asset. For UTXO based assets, the response will contain the suggested fee per byte, for ETH/ETC based assets, the suggested gas price, and for XRP/XLM, the transaction fee.
+  Gets the estimated required fee for an asset.
+  Fireblocks fetches, calculates and caches the result every 30 seconds.
+
+  Customers should query this API while taking the caching interval into consideration.
+
+  **Options:**
 
   - `asset`: The asset for which to estimate the fee
+
+  Notes:
+
+  - The `networkFee` parameter is the `gasPrice` with a given delta added, multiplied by the gasLimit plus the delta. - The estimation provided depends on the asset type.
+
+  - For UTXO-based assets, the response contains the `feePerByte` parameter
+  - For ETH-based and all EVM based assets, the response will contain `gasPrice` parameter. This is calculated by adding the `baseFee` to the `actualPriority` based on the latest 12 blocks. The response for ETH-based  contains the `baseFee`, `gasPrice`, and `priorityFee` parameters.
+  - For ADA-based assets, the response will contain the parameter `networkFee` and `feePerByte` parameters.
+  - For XRP and XLM, the response will contain the transaction fee.
+  - For other assets, the response will contain the `networkFee` parameter.
+
+  Learn more about Fireblocks Fee Management in the following [guide](https://developers.fireblocks.com/reference/estimate-transaction-fee).
+
+  **Endpoint Permission**: Admin, Non-Signing Admin, Signer, Approver, Editor.
+
+
+
   """
   def get_asset_fee(asset) when is_binary(asset) do
-    get!("#{@base_path}?asset=#{asset}")
+    get!("/v1/estimate_network_fee?assetId=#{asset}")
   end
 
   @doc """

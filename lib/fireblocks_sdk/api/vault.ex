@@ -134,7 +134,7 @@ defmodule FireblocksSdk.Api.Vault do
   """
   def segwit_to_legacy(vault_id, asset_id, address_id, idempotentKey \\ "") do
     post!(
-      "#{@base_path}/#{vault_id}/#{asset_id}/addresses/#{address_id}/create_legacy",
+      "#{@accounts_path}/#{vault_id}/#{asset_id}/addresses/#{address_id}/create_legacy",
       "",
       idempotentKey
     )
@@ -148,7 +148,7 @@ defmodule FireblocksSdk.Api.Vault do
   """
   def get_utxo_max_spendable_amount(vault_id, asset_id, manual_signing \\ false) do
     get!(
-      "#{@accounts_path}/#{vault_id}/#{asset_id}/max_spendable_amount?manualSignging=#{manual_signing}"
+      "#{@accounts_path}/#{vault_id}/#{asset_id}/max_spendable_amount?manualSigning=#{manual_signing}"
     )
   end
 
@@ -210,7 +210,7 @@ defmodule FireblocksSdk.Api.Vault do
       |> Keyword.delete(:addressId)
       |> Jason.encode!()
 
-    post!(
+    put!(
       "#{@accounts_path}/#{vault_id}/#{asset_id}/addresses/#{address_id}",
       params,
       idempotentKey

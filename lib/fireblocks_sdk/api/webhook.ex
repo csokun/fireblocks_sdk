@@ -57,6 +57,7 @@ defmodule FireblocksSdk.Api.Webhook do
   end
 
   @webhook_v2_update_request [
+    webhookId: [type: :string, required: true, doc: "The ID of the webhook to update"],
     url: [type: :string],
     description: [type: :string],
     events: [type: {:list, :string}],
@@ -72,8 +73,9 @@ defmodule FireblocksSdk.Api.Webhook do
   """
   def update(webhook, idempotentKey \\ "") do
     {:ok, options} = NimbleOptions.validate(webhook, @webhook_v2_update_request)
-    params = options |> Jason.encode!()
-    patch!("#{@base_path}", params, idempotentKey)
+    webhook_id = options[:webhookId]
+    params = options |> Keyword.delete(:webhookId) |> Jason.encode!()
+    patch!("#{@base_path}/#{webhook_id}", params, idempotentKey)
   end
 
   @doc """
@@ -146,7 +148,7 @@ defmodule FireblocksSdk.Api.Webhook do
       |> atom_to_string([:sortBy])
       |> URI.encode_query()
 
-    get!("#{@base_path}/#{webhook_id}?#{query_string}")
+    get!("#{@base_path}/#{webhook_id}/notifications?#{query_string}")
   end
 
   @webhook_v2_get_notification_request [

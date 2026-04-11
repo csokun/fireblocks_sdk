@@ -27,13 +27,6 @@ defmodule FireblocksSdk.Api.ExchangeAccount do
   end
 
   @doc """
-  Find an asset for an exchange account.
-  """
-  def get_exchange_asset(exchangeId, assetId) when is_binary(exchangeId) and is_binary(assetId) do
-    get!("#{@base_path}/#{exchangeId}/#{assetId}")
-  end
-
-  @doc """
   Transfer funds between trading accounts under the same exchange account.
 
   Options:\n#{NimbleOptions.docs(Schema.exchange_transfer_request())}
@@ -60,7 +53,7 @@ defmodule FireblocksSdk.Api.ExchangeAccount do
   @doc """
   Find an asset in an exchange account
   """
-  def get_asset(exchange_id, asset_id) when is_binary(exchange_id) when is_binary(asset_id) do
+  def get_asset(exchange_id, asset_id) when is_binary(exchange_id) and is_binary(asset_id) do
     get!("#{@base_path}/#{exchange_id}/#{asset_id}")
   end
 

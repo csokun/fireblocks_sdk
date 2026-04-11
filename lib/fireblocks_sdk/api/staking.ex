@@ -159,7 +159,7 @@ defmodule FireblocksSdk.Api.Staking do
     params = options |> Keyword.delete(:chainDescriptor) |> Jason.encode!()
 
     post!(
-      "#{@base_path}/chains/#{chain_descriptor}/unstake",
+      "#{@base_path}/chains/#{chain_descriptor}/withdraw",
       params,
       idempotentKey
     )

@@ -93,7 +93,7 @@ defmodule FireblocksSdk.Schema do
   def vault_balance_filter(),
     do: [
       accountNamePrefix: [type: :string],
-      accountNameSuffic: [type: :string]
+      accountNameSuffix: [type: :string]
     ]
 
   def vault_asset_addresses_request(),

@@ -43,7 +43,7 @@ defmodule FireblocksSdk.Api.ContractInteractions do
       |> Jason.encode!()
 
     post!(
-      "#{@interactions}/#{baseAssetId}/contract_address/#{contractAddress}/functions",
+      "#{@interactions}/#{baseAssetId}/contract_address/#{contractAddress}/functions/read",
       params,
       idempotentKey
     )
@@ -87,7 +87,7 @@ defmodule FireblocksSdk.Api.ContractInteractions do
   Options:\n#{NimbleOptions.docs(@interaction_write)}
   """
   def write(options, idempotentKey \\ "") do
-    {:ok, params} = NimbleOptions.validate(options, @interaction_read)
+    {:ok, params} = NimbleOptions.validate(options, @interaction_write)
     baseAssetId = params[:baseAssetId]
     contractAddress = params[:contractAddress]
 
@@ -99,7 +99,7 @@ defmodule FireblocksSdk.Api.ContractInteractions do
       |> Jason.encode!()
 
     post!(
-      "#{@interactions}/#{baseAssetId}/contract_address/#{contractAddress}/functions",
+      "#{@interactions}/#{baseAssetId}/contract_address/#{contractAddress}/functions/write",
       params,
       idempotentKey
     )

@@ -120,4 +120,12 @@ defmodule FireblocksSdk.Api.Tokenization do
     {:ok, params} = NimbleOptions.validate(params, @get_deployable_address_request)
     post!("#{@base_path}/tokens/deterministic_address", params, idempotentKey)
   end
+
+  def templates() do
+    get!("#{@base_path}/templates")
+  end
+
+  def get_template(id) do
+    get!("#{@base_path}/templates/#{id}")
+  end
 end
