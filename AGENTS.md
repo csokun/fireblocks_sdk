@@ -21,7 +21,7 @@ This is an Elixir SDK for the Fireblocks API. It is generated/maintained against
 - **Map to Elixir:** Identify corresponding Elixir modules in `lib/fireblocks_sdk/`.
 
 ### 2. Implementation Rules
-- **Module Structure:** Mirror the API `tags` or path hierarchy (e.g., `FireblocksSdk.Vault.Assets`).
+- **Module Structure:** Mirror the API `tags` or path hierarchy (e.g., `FireblocksSdk.Api.Asset` in `lib/fireblocks_sdk/api/assets.ex`).
 - **Validation & Types (`NimbleOptions`):**
   - **Colocation:** Define a `@<function>_schema` module attribute using `NimbleOptions` directly above the `@doc` of the function that uses it. For example, `create/2` → `@create_schema`, `list/1` → `@list_schema`, `update_settings/2` → `@update_settings_schema`.
   - **Naming convention:** Always use the `@<function>_schema` naming pattern. Never use a generic `@options_schema` or an unrelated name, and never reuse the same attribute name for two different functions in the same module (silent shadowing).
