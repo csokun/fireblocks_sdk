@@ -125,6 +125,18 @@ defmodule FireblocksSdk.Api.ContractInteractions do
     get!("#{@interactions}/#{params[:baseAssetId]}/tx_hash/#{params[:txHash]}/receipt")
   end
 
+  @doc """
+  Get the contract address deployed by a transaction, identified by blockchain native asset ID
+  and transaction hash.
+
+  - `base_asset_id`: Base asset ID of the blockchain (e.g. `"ETH"`, `"ETH_TEST5"`)
+  - `tx_hash`: The transaction hash that deployed the contract
+  """
+  def get_contract_address(base_asset_id, tx_hash)
+      when is_binary(base_asset_id) and is_binary(tx_hash) do
+    get!("#{@interactions}/#{base_asset_id}/tx_hash/#{tx_hash}")
+  end
+
   @decode_schema [
     baseAssetId: [type: :string, required: true, doc: "Base assetId e.g ETH, ETH_TEST5"],
     contractAddress: [type: :string, required: true],

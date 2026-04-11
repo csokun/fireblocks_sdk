@@ -20,6 +20,51 @@ defmodule FireblocksSdk.Api.ExchangeAccount do
     :unified
   ]
 
+  @exchange_type [
+    :independent_reserve,
+    :enclave_markets,
+    :bit,
+    :coinflex,
+    :kucoin,
+    :pxs,
+    :liquid,
+    :bithumb,
+    :bitfinex,
+    :bitso,
+    :bitstamp,
+    :kraken,
+    :krakenintl,
+    :binance,
+    :binanceus,
+    :cryptocom,
+    :bybit_v2,
+    :coinbasepro,
+    :coinbaseprime,
+    :coinbaseinternational,
+    :whitebit,
+    :coinbaseexchange,
+    :korbit,
+    :hitbtc,
+    :gemini,
+    :circle,
+    :bitmex,
+    :huobi,
+    :deribit,
+    :okcoin_v5,
+    :okex,
+    :coinmetro,
+    :gateio,
+    :scrypt,
+    :coinhako,
+    :lightbit,
+    :bullish,
+    :canvas_connect,
+    :bitget,
+    :luno,
+    :bit_genera,
+    :transfero
+  ]
+
   @get_accounts_schema [
     before: [type: :string, doc: "Fetch results before this cursor"],
     after: [type: :string, doc: "Fetch results after this cursor"],
@@ -133,5 +178,63 @@ defmodule FireblocksSdk.Api.ExchangeAccount do
       |> Jason.encode!()
 
     post!("#{@base_path}/#{exchange_id}/convert", params, idempotent_key)
+  end
+
+  @add_account_schema [
+    exchangeType: [
+      type: {:in, @exchange_type},
+      required: true,
+      doc: "The type of exchange account to add"
+    ],
+    name: [type: :string, required: true, doc: "Display name of the exchange account"],
+    creds: [type: :string, doc: "Encrypted credentials"],
+    key: [type: :string, doc: "API key of the exchange"],
+    mainAccountId: [type: :string, doc: "Optional main account ID of the exchange"]
+  ]
+
+  @doc """
+  Add an exchange account to the workspace.
+
+  ```
+  FireblocksSdk.Api.ExchangeAccount.add_account([
+    exchangeType: :binance,
+    name: "My Binance Account",
+    key: "api-key-here"
+  ])
+  ```
+
+  Options:\n#{NimbleOptions.docs(@add_account_schema)}
+  """
+  def add_account(opts, idempotent_key \\ "") do
+    {:ok, options} = NimbleOptions.validate(opts, @add_account_schema)
+
+    params =
+      options
+      |> atom_to_upper([:exchangeType])
+      |> Enum.into(%{})
+      |> Jason.encode!()
+
+    post!(@base_path, params, idempotent_key)
+  end
+
+  @doc """
+  Get the public key used to encrypt exchange account credentials.
+
+  Returns the RSA public key that should be used to encrypt exchange API
+  credentials before submitting them via `add_account/2`.
+  """
+  def get_credentials_public_key() do
+    get!("#{@base_path}/credentials_public_key")
+  end
+
+  @doc """
+  Get a specific asset on an exchange account.
+
+  - `exchange_account_id`: The ID of the exchange account
+  - `asset_id`: The asset ID (e.g. `"BTC"`, `"ETH"`)
+  """
+  def get_account_asset(exchange_account_id, asset_id)
+      when is_binary(exchange_account_id) and is_binary(asset_id) do
+    get!("#{@base_path}/#{exchange_account_id}/#{asset_id}")
   end
 end

@@ -358,4 +358,113 @@ defmodule FireblocksSdk.Api.Staking do
       idempotentKey
     )
   end
+
+  @consolidate_schema [
+    chainDescriptor: [
+      type: {:in, ["ETH", "ETH_TEST6", "ETH_TEST_HOODI"]},
+      required: true,
+      doc: "Protocol identifier. Supported values: `ETH`, `ETH_TEST6`, `ETH_TEST_HOODI`"
+    ],
+    sourceId: [
+      type: :string,
+      required: true,
+      doc: "Id of the source position to consolidate from"
+    ],
+    destinationId: [
+      type: :string,
+      required: true,
+      doc: "Id of the destination position to consolidate into"
+    ],
+    fee: [
+      type: :string,
+      doc: "Fee for the transaction. Only one of `fee`/`feeLevel` is required."
+    ],
+    feeLevel: [type: {:in, @fee_level}],
+    txNote: [type: :string, doc: "The note to associate with the consolidation transaction."]
+  ]
+
+  @doc """
+  Consolidate ETH staking positions (validator consolidation).
+
+  Merges a source ETH staking position into a destination position on the beacon chain.
+
+  ```
+  FireblocksSdk.Api.Staking.consolidate([
+    chainDescriptor: "ETH",
+    sourceId: "b70701f4-d7b1-4795-a8ee-b09cdb5b850d",
+    destinationId: "f3432f4-34d1-43495-a8ee-jfdjnfj34i3",
+    feeLevel: :medium
+  ])
+  ```
+
+  Options:\n#{NimbleOptions.docs(@consolidate_schema)}
+  """
+  def consolidate(consolidate_request, idempotentKey \\ "") do
+    {:ok, options} = NimbleOptions.validate(consolidate_request, @consolidate_schema)
+
+    chain_descriptor = options[:chainDescriptor]
+
+    params =
+      options
+      |> Keyword.delete(:chainDescriptor)
+      |> atom_to_upper([:feeLevel])
+      |> Enum.into(%{})
+      |> Jason.encode!()
+
+    post!(
+      "#{@base_path}/chains/#{chain_descriptor}/consolidate",
+      params,
+      idempotentKey
+    )
+  end
+
+  @get_positions_paginated_schema [
+    pageSize: [
+      type: :integer,
+      default: 10,
+      doc:
+        "Number of results per page (min: 1, max: 100). Returns a paginated `{data, next}` object."
+    ],
+    chainDescriptor: [
+      type: :string,
+      doc:
+        "Protocol identifier to filter positions (e.g. `ETH`, `SOL`, `ATOM_COS`). If omitted, positions across all supported chains are returned."
+    ],
+    vaultAccountId: [
+      type: :string,
+      doc:
+        "Filter positions by Fireblocks vault account ID. If omitted, positions across all vault accounts are returned."
+    ],
+    pageCursor: [
+      type: :string,
+      doc: "Cursor for the next page of results. Use the `next` value from the previous response."
+    ],
+    order: [
+      type: {:in, ["ASC", "DESC"]},
+      default: "DESC",
+      doc: "Sort order: `ASC` or `DESC` (default: `DESC`)"
+    ]
+  ]
+
+  @doc """
+  List staking positions (paginated).
+
+  Returns a paginated list of staking positions. Use `pageCursor` from the response's `next` field
+  to fetch subsequent pages.
+
+  ```
+  FireblocksSdk.Api.Staking.get_positions_paginated([
+    pageSize: 20,
+    chainDescriptor: "ETH",
+    order: "DESC"
+  ])
+  ```
+
+  Options:\n#{NimbleOptions.docs(@get_positions_paginated_schema)}
+  """
+  def get_positions_paginated(options \\ []) do
+    {:ok, params} = NimbleOptions.validate(options, @get_positions_paginated_schema)
+    query_string = params |> URI.encode_query()
+    get!("#{@base_path}/positions_paginated?#{query_string}")
+  end
 end

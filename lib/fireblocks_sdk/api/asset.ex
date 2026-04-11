@@ -104,4 +104,40 @@ defmodule FireblocksSdk.Api.Asset do
   def get(assetId) when is_bitstring(assetId) do
     get!("#{@assets_path}/#{assetId}")
   end
+
+  @update_metadata_schema [
+    id: [type: :string, required: true, doc: "The ID or legacyId of the asset to update"],
+    metadata: [
+      type: :map,
+      doc:
+        "Asset metadata object. May contain a `note` map with a `text` field (string) for the user note."
+    ]
+  ]
+
+  @doc """
+  Update the user's metadata for an asset.
+
+  Updates mutable, workspace-scoped metadata (e.g. a free-text note) for the given asset.
+
+  ```
+    FireblocksSdk.Api.Asset.update_metadata([
+      id: "ETH",
+      metadata: %{note: %{text: "Primary gas token"}}
+    ])
+  ```
+
+  Options: \n#{NimbleOptions.docs(@update_metadata_schema)}
+  """
+  def update_metadata(opts, idempotent_key \\ "") do
+    {:ok, options} = NimbleOptions.validate(opts, @update_metadata_schema)
+    id = Keyword.fetch!(options, :id)
+
+    params =
+      options
+      |> Keyword.delete(:id)
+      |> Enum.into(%{})
+      |> Jason.encode!()
+
+    patch!("#{@assets_path}/#{id}", params, idempotent_key)
+  end
 end

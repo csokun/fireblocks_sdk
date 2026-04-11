@@ -427,4 +427,177 @@ defmodule FireblocksSdk.Api.Vault do
     {:ok, params} = NimbleOptions.validate(options, @get_asset_wallets_schema)
     get!("#{@base_path}/asset_wallets?#{URI.encode_query(params)}")
   end
+
+  @create_multiple_accounts_schema [
+    count: [type: :integer, required: true, doc: "Number of vault accounts to create"],
+    baseAssetIds: [
+      type: {:list, :string},
+      required: true,
+      doc: "Array of base asset IDs to initialise in each new vault account"
+    ],
+    names: [
+      type: {:list, :string},
+      doc:
+        "Names to assign to vault accounts. Cannot be combined with `vaultAccountNamesStartingIndex` or `prefix`"
+    ],
+    vaultAccountNamesStartingIndex: [
+      type: :integer,
+      doc: "Copy vault account names starting from this index. Cannot be combined with `names`"
+    ],
+    prefix: [
+      type: :string,
+      doc:
+        "When copying from existing vault accounts (`vaultAccountNamesStartingIndex`), adds a prefix to the names. Cannot be combined with `names`"
+    ],
+    tagIds: [
+      type: {:list, :string},
+      doc: "Optional list of tag IDs (UUIDs, max 20) to attach to all created vault accounts"
+    ]
+  ]
+
+  @doc """
+  Bulk creation of new vault accounts.
+
+  Initiates a background job that creates multiple vault accounts in a single request.
+  Poll the returned `jobId` with `get_create_multiple_accounts_job/1` to track progress.
+
+  ```
+  FireblocksSdk.Api.Vault.create_multiple_accounts([
+    count: 10,
+    baseAssetIds: ["ETH", "BTC"],
+    prefix: "Ops-"
+  ])
+  ```
+
+  Options:\n#{NimbleOptions.docs(@create_multiple_accounts_schema)}
+  """
+  def create_multiple_accounts(params, idempotent_key \\ "") do
+    {:ok, options} = NimbleOptions.validate(params, @create_multiple_accounts_schema)
+    data = options |> Enum.into(%{}) |> Jason.encode!()
+    post!("#{@accounts_path}/bulk", data, idempotent_key)
+  end
+
+  @doc """
+  Get the status of a bulk vault account creation job.
+
+  - `job_id`: The job ID returned by `create_multiple_accounts/2`
+  """
+  def get_create_multiple_accounts_job(job_id) when is_binary(job_id) do
+    get!("#{@accounts_path}/bulk/#{job_id}")
+  end
+
+  @create_multiple_deposit_addresses_schema [
+    vaultAccountId: [
+      type: :integer,
+      required: true,
+      doc: "Existing vault account ID to add deposit addresses to"
+    ],
+    assetId: [type: :string, required: true, doc: "Asset ID"],
+    count: [type: :integer, required: true, doc: "Number of deposit addresses to create"],
+    descriptions: [
+      type: {:list, :string},
+      doc: "Descriptions for the newly created addresses"
+    ],
+    vaultAccountToCopyDescFrom: [
+      type: :integer,
+      doc:
+        "Existing vault account ID to copy deposit address descriptions from when no `descriptions` are provided"
+    ],
+    vaultAccountToCopyDescFromIndex: [
+      type: :integer,
+      doc:
+        "Starting index within the source vault account to copy deposit address descriptions from"
+    ]
+  ]
+
+  @doc """
+  Bulk creation of deposit addresses for a vault account asset.
+
+  Initiates a background job that creates multiple deposit addresses in a single request.
+  Poll the returned `jobId` with `get_create_multiple_deposit_addresses_job/1` to track progress.
+
+  ```
+  FireblocksSdk.Api.Vault.create_multiple_deposit_addresses([
+    vaultAccountId: 1,
+    assetId: "ETH",
+    count: 5
+  ])
+  ```
+
+  Options:\n#{NimbleOptions.docs(@create_multiple_deposit_addresses_schema)}
+  """
+  def create_multiple_deposit_addresses(params, idempotent_key \\ "") do
+    {:ok, options} =
+      NimbleOptions.validate(params, @create_multiple_deposit_addresses_schema)
+
+    data = options |> Enum.into(%{}) |> Jason.encode!()
+    post!("#{@accounts_path}/addresses/bulk", data, idempotent_key)
+  end
+
+  @doc """
+  Get the status of a bulk deposit address creation job.
+
+  - `job_id`: The job ID returned by `create_multiple_deposit_addresses/2`
+  """
+  def get_create_multiple_deposit_addresses_job(job_id) when is_binary(job_id) do
+    get!("#{@accounts_path}/addresses/bulk/#{job_id}")
+  end
+
+  @attach_detach_tags_schema [
+    vaultAccountIds: [
+      type: {:list, :string},
+      required: true,
+      doc: "The IDs of the vault accounts to modify tags on (1–100 accounts)"
+    ],
+    tagIdsToAttach: [
+      type: {:list, :string},
+      doc: "The IDs of the tags to attach (1–20 UUIDs)"
+    ],
+    tagIdsToDetach: [
+      type: {:list, :string},
+      doc: "The IDs of the tags to detach (1–20 UUIDs)"
+    ]
+  ]
+
+  @doc """
+  Attach or detach tags from one or more vault accounts.
+
+  ```
+  FireblocksSdk.Api.Vault.attach_detach_tags([
+    vaultAccountIds: ["1", "2", "3"],
+    tagIdsToAttach: ["tag-uuid-1"],
+    tagIdsToDetach: ["tag-uuid-2"]
+  ])
+  ```
+
+  Options:\n#{NimbleOptions.docs(@attach_detach_tags_schema)}
+  """
+  def attach_detach_tags(params, idempotent_key \\ "") do
+    {:ok, options} = NimbleOptions.validate(params, @attach_detach_tags_schema)
+    data = options |> Enum.into(%{}) |> Jason.encode!()
+    post!("#{@accounts_path}/attached_tags", data, idempotent_key)
+  end
+
+  @doc """
+  Get the maximum BIP44 index used for a vault account asset.
+
+  Returns the highest derivation index currently in use for the given vault account
+  and asset, which is useful before generating new addresses.
+
+  - `vault_account_id`: The vault account ID
+  - `asset_id`: The asset ID (e.g. `"ETH"`)
+  """
+  def get_max_bip44_index_used(vault_account_id, asset_id)
+      when is_binary(vault_account_id) and is_binary(asset_id) do
+    get!("#{@accounts_path}/#{vault_account_id}/#{asset_id}/max_bip44_index_used")
+  end
+
+  @doc """
+  Get the aggregated vault balance for a specific asset across all vault accounts.
+
+  - `asset_id`: The asset ID (e.g. `"ETH"`)
+  """
+  def get_vault_balance_by_asset(asset_id) when is_binary(asset_id) do
+    get!("#{@base_path}/assets/#{asset_id}")
+  end
 end
