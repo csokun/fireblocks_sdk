@@ -550,4 +550,127 @@ defmodule FireblocksSdk.Schema do
         doc: "The note to associate with the transactions."
       ]
     ]
+
+  def management_audit_logs_request(),
+    do: [
+      timePeriod: [
+        type: {:in, [:day, :week]},
+        doc: "The last time period to fetch. One of `:day`, `:week`"
+      ],
+      cursor: [
+        type: :string,
+        doc: "Pagination cursor - the next id to start from"
+      ]
+    ]
+
+  def set_ota_status_request(),
+    do: [
+      enabled: [
+        type: :boolean,
+        doc: "Set `true` to enable or `false` to disable OTA transactions"
+      ]
+    ]
+
+  def user_group_create_request(),
+    do: [
+      groupName: [
+        type: :string,
+        doc: "The user group name"
+      ],
+      memberIds: [
+        type: {:list, :string},
+        doc: "Array of user IDs to include in the group"
+      ]
+    ]
+
+  def user_group_update_request(),
+    do: [
+      groupName: [
+        type: :string,
+        doc: "The user group name"
+      ],
+      memberIds: [
+        type: {:list, :string},
+        doc: "Array of user IDs to include in the group"
+      ]
+    ]
+
+  def tap_legacy_policy_rules(),
+    do: [
+      rules: [
+        type: {:list, :map},
+        doc: "Array of legacy policy rule objects"
+      ]
+    ]
+
+  def tap_publish_draft_request(),
+    do: [
+      draftId: [
+        type: :string,
+        doc: "Draft unique identifier to publish"
+      ]
+    ]
+
+  def tags_list_request(),
+    do: [
+      pageCursor: [
+        type: :string,
+        doc: "Page cursor for the next page of results"
+      ],
+      pageSize: [
+        type: :non_neg_integer,
+        doc: "Number of results per page (1–100, default 100)"
+      ],
+      label: [
+        type: :string,
+        doc: "Filter tags by label prefix"
+      ],
+      tagIds: [
+        type: {:list, :string},
+        doc: "Filter by specific tag IDs (max 100 UUIDs)"
+      ],
+      includePendingApprovalsInfo: [
+        type: :boolean,
+        default: false,
+        doc: "Include pending approval info in results"
+      ],
+      isProtected: [
+        type: :boolean,
+        doc: "Filter by tag protection status"
+      ]
+    ]
+
+  def create_tag_request(),
+    do: [
+      label: [
+        type: :string,
+        required: true,
+        doc: "The tag label (2–30 characters)"
+      ],
+      description: [
+        type: :string,
+        doc: "Tag description (max 250 characters)"
+      ],
+      color: [
+        type: :string,
+        doc: "Hex color code (e.g. `#FF5733`)"
+      ],
+      isProtected: [
+        type: :boolean,
+        default: false,
+        doc: "Whether the tag is protected from modification by non-owners"
+      ]
+    ]
+
+  def update_tag_request(),
+    do: [
+      label: [
+        type: :string,
+        doc: "The tag label"
+      ],
+      description: [
+        type: :string,
+        doc: "Tag description"
+      ]
+    ]
 end

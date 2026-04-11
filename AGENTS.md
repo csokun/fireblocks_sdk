@@ -21,16 +21,23 @@ This is an Elixir SDK for the Fireblocks API. It is generated/maintained against
 - **Map to Elixir:** Identify corresponding Elixir modules in `lib/fireblocks_sdk/`.
 
 ### 2. Implementation Rules
-- **Module Structure:** Mirror the API tag/path structure.
-- **Typespecs:** Generate definitions using NimbleOption directly from Swagger schema definitions.
+- **Module Structure:** Mirror the API `tags` or path hierarchy (e.g., `FireblocksSdk.Vault.Assets`).
+- **Validation & Types (`NimbleOptions`):**
+  - **Colocation:** Define `@options_schema` using `NimbleOptions` directly within the module where the function resides.
+  - **Shared Schemas:** If a request/response body or complex query param set is reused across multiple modules, define it in `FireblocksSdk.Schema` and import/reference it.
+  - **Mapping:**
+    - Map Swagger `required` fields to `NimbleOptions.required/1`.
+    - Map Swagger types (`string`, `integer`, `boolean`) to corresponding Elixir types in `NimbleOptions`.
+    - Use `NimbleOptions.validate!/2` at the start of public functions to enforce contract compliance.
 - **Function Signatures:**
-  - Name functions after the operationId or path (snake_case).
-  - Arguments must match required query/path/body parameters.
-  - Use keyword lists for optional query params.
+  - **Naming:** Derive from `operationId` (preferred) or path segments, converted to `snake_case`.
+  - **Arguments:**
+    - Positional args for required path parameters.
+    - Single keyword list arg for optional query params and body data (validated against `@options_schema`).
 - **Documentation:**
-  - Copy summary/description from Swagger into `@doc` strings.
-  - Include `@spec` that mirrors the Swagger input/output types.
-  - Add `@deprecated` if marked in Swagger.
+  - **Sync:** Copy `summary` and `description` from Swagger into `@doc`.
+  - **Specs:** Include `@spec` reflecting the validated input (keyword list) and the decoded response struct/map.
+  - **Deprecation:** Add `@deprecated "See Swagger spec for replacement"` if marked in the spec.
 
 ### 3. Validation
 - **Compile:** Ensure `mix compile` passes with no warnings.
