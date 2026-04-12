@@ -1,7 +1,7 @@
 defmodule FireblocksSdk.MixProject do
   use Mix.Project
 
-  @version "0.2.0"
+  @version "0.2.1"
   @repo_url "https://github.com/csokun/fireblocks_sdk"
 
   def getVersion(), do: @version

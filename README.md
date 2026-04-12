@@ -9,7 +9,7 @@ Adding `fireblocks_sdk` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:fireblocks_sdk, "~> 0.2.0"}
+    {:fireblocks_sdk, "~> 0.2.1"}
   ]
 end
 ```
