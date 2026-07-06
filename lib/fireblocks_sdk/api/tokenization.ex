@@ -151,4 +151,116 @@ defmodule FireblocksSdk.Api.Tokenization do
   def get_template(id) do
     get!("#{@base_path}/templates/#{id}")
   end
+
+  @transfers_schema [
+    id: [type: :string, required: true, doc: "The token link id"],
+    startDate: [type: :string, doc: "Start date of the time range in ISO 8601 format"],
+    endDate: [type: :string, doc: "End date of the time range in ISO 8601 format"],
+    pageCursor: [type: :string, doc: "Page cursor to get the next page"],
+    pageSize: [type: :non_neg_integer, default: 10],
+    sortBy: [
+      type: {:in, [:blockTimeStamp]},
+      default: :blockTimeStamp,
+      doc: "Sorting field for transfers"
+    ],
+    order: [type: {:in, [:asc, :desc]}, default: :desc],
+    sender: [type: :string, doc: "Filter transfers by sender address"],
+    receiver: [type: :string, doc: "Filter transfers by receiver address"]
+  ]
+
+  @doc """
+  Returns a paginated list of ERC20 transfer events for the token contract, optionally filtered by date range.
+
+  ```
+  FireblocksSdk.Api.Tokenization.transfers([
+    id: fbfbfbfb-fbfb-fbfb-fbfb-fbfbfbfbfbfb
+  ])
+  ```
+
+  Options:\n#{NimbleOptions.docs(@transfers_schema)}
+  """
+  def transfers(opts) do
+    {:ok, options} = NimbleOptions.validate(opts, @transfers_schema)
+    id = options[:id]
+
+    query_string =
+      options
+      |> Keyword.delete(:id)
+      |> atom_to_string([:sortBy])
+      |> atom_to_upper([:order])
+      |> Enum.into(%{})
+      |> URI.encode_query()
+
+    get!("#{@base_path}/tokens/#{id}/transfers?#{query_string}")
+  end
+
+  @doc """
+  Returns a paginated list of onchain transactions for the token contract, optionally filtered by date range.
+
+  ```
+  FireblocksSdk.Api.Tokenization.transactions([
+    id: fbfbfbfb-fbfb-fbfb-fbfb-fbfbfbfbfbfb
+  ])
+  ```
+
+  Options:\n#{NimbleOptions.docs(@transfers_schema)}
+  """
+  def transactions(opts) do
+    {:ok, options} = NimbleOptions.validate(opts, @transfers_schema)
+    id = options[:id]
+
+    query_string =
+      options
+      |> Keyword.delete(:id)
+      |> atom_to_string([:sortBy])
+      |> atom_to_upper([:order])
+      |> Enum.into(%{})
+      |> URI.encode_query()
+
+    get!("#{@base_path}/tokens/#{id}/transfers?#{query_string}")
+  end
+
+  @doc """
+  Returns a list of currently active roles for the token contract.
+  """
+  def rbac(token_id) do
+    get!("#{@base_path}/tokens/#{token_id}/rbac")
+  end
+
+  @token_balances [
+    id: [type: :string, required: true, doc: "The token link id"],
+    pageCursor: [type: :string, doc: "Page cursor to get the next page"],
+    pageSize: [type: :non_neg_integer, default: 10],
+    sortBy: [
+      type: {:in, [:blockTimestamp, :accountAddress]},
+      default: :blockTimestamp,
+      doc: "Sorting field for transfers"
+    ],
+    order: [type: {:in, [:asc, :desc]}, default: :desc]
+  ]
+  @doc """
+  Returns the latest balance for each unique address holding this token.
+
+  ```
+  FireblocksSdk.Api.Tokenization.balances([
+    id: fbfbfbfb-fbfb-fbfb-fbfb-fbfbfbfbfbfb
+  ])
+  ```
+
+  Options:\n#{NimbleOptions.docs(@token_balances)}
+  """
+  def balances(opts) do
+    {:ok, options} = NimbleOptions.validate(opts, @token_balances)
+    id = options[:id]
+
+    query_string =
+      options
+      |> Keyword.delete(:id)
+      |> atom_to_string([:sortBy])
+      |> atom_to_upper([:order])
+      |> Enum.into(%{})
+      |> URI.encode_query()
+
+    get!("#{@base_path}/tokens/#{id}/balances?#{query_string}")
+  end
 end
