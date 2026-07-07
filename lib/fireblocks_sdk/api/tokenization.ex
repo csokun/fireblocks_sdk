@@ -263,4 +263,68 @@ defmodule FireblocksSdk.Api.Tokenization do
 
     get!("#{@base_path}/tokens/#{id}/balances?#{query_string}")
   end
+
+  @doc """
+  Get the total count of linked tokens
+  """
+  def count(), do: get!("#{@base_path}/tokens/count")
+
+  @doc """
+  Returns the total number of unique holders and the total supply for the token contract.
+  """
+  def summary(token_id), do: get!("#{@base_path}/tokens/#{token_id}/summary")
+
+  @doc """
+  Returns the latest token balance for the specified account address.
+  """
+  def balance(token_id, wallet), do: get!("#{@base_path}/tokens/#{token_id}/balances/#{wallet}")
+
+  @balance_history_schema [
+    id: [type: :string, required: true, doc: "The token link id"],
+    accountAddress: [
+      type: :string,
+      required: true,
+      doc: "The account address to get balance history for"
+    ],
+    startDate: [type: :string, doc: "Start date of the time range in ISO 8601 format"],
+    endDate: [type: :string, doc: "End date of the time range in ISO 8601 format"],
+    interval: [
+      type: {:in, [:hour, :day, :week, :month]},
+      default: :day,
+      doc: "Time interval for grouping data"
+    ],
+    pageCusor: [type: :string, doc: "Page cursor to get the next page"],
+    pageSize: [
+      type: :non_neg_integer,
+      doc: "Number of items per page (max 100), requesting more than 100 will return 100 items",
+      default: 10
+    ],
+    sortBy: [
+      type: {:in, [:blockTimestamp]},
+      default: :blockTimestamp,
+      doc: "Sorting only supported by 'blockTimestamp'"
+    ],
+    order: [type: {:in, [:asc, :desc]}, default: :desc, doc: "ASC / DESC ordering (default DESC)"]
+  ]
+  @doc """
+  Returns paginated balance history for the specified account address with optional time-range filtering.
+
+  Options:\n#{NimbleOptions.docs(@balance_history_schema)}
+  """
+  def balance_history(opts) do
+    {:ok, options} = NimbleOptions.validate(opts, @token_balances)
+    token_id = options[:id]
+    accountAddress = options[:accountAddress]
+
+    query_string =
+      options
+      |> Keyword.delete(:id)
+      |> Keyword.delete(:accountAddress)
+      |> atom_to_string([:sortBy])
+      |> atom_to_upper([:order, :interval])
+      |> Enum.into(%{})
+      |> URI.encode_query()
+
+    get!("#{@base_path}/tokens/#{token_id}/balances/#{accountAddress}/history?#{query_string}")
+  end
 end
