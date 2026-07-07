@@ -279,8 +279,7 @@ defmodule FireblocksSdk.Api.Transaction do
   ])
   ```
 
-  Options: 
-#{NimbleOptions.docs(@list_schema)}
+  Options:\n#{NimbleOptions.docs(@list_schema)}
   """
   def list(filter) do
     {:ok, params} = NimbleOptions.validate(filter, @list_schema)
@@ -330,8 +329,7 @@ defmodule FireblocksSdk.Api.Transaction do
   ])
   ```
 
-  Supported options:
-#{NimbleOptions.docs(@create_schema)}
+  Supported options:\n#{NimbleOptions.docs(@create_schema)}
   """
   def create(transaction, idempotent_key \\ "") do
     params = parse_transaction_creation_request(transaction)
@@ -369,8 +367,7 @@ defmodule FireblocksSdk.Api.Transaction do
   @doc """
   Overrides the required number of confirmations for transaction completion by transaction ID.
 
-  Options:
-#{NimbleOptions.docs(@set_confirmation_threshold_schema)}
+  Options:\n#{NimbleOptions.docs(@set_confirmation_threshold_schema)}
   """
   def set_confirmation_threshold(threshold, idempotencyKey \\ "") do
     {:ok, options} =
@@ -399,8 +396,7 @@ defmodule FireblocksSdk.Api.Transaction do
     ])
   ```
 
-  Options: 
-#{NimbleOptions.docs(@drop_schema)}
+  Options:\n#{NimbleOptions.docs(@drop_schema)}
   """
   def drop(tx_drop_req, idempotencyKey \\ "") do
     {:ok, options} = NimbleOptions.validate(tx_drop_req, @drop_schema)

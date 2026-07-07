@@ -72,11 +72,45 @@ defmodule FireblocksSdk.Api.Vault do
     post!("#{@accounts_path}/#{vault_id}/unhide", "", idempotentKey)
   end
 
+  @activate_schema [
+    vaultAccountId: [
+      type: :string,
+      required: true,
+      doc: "The ID of the vault account to return, or 'default' for the default vault account"
+    ],
+    assetId: [type: :string, required: true, doc: "The ID of the asset"],
+    blockchainWalletType: [
+      type: :string,
+      doc: "Optional immutable blockchain wallet type to store per tenant+vault"
+    ]
+  ]
+
   @doc """
-  Initiates activation for a wallet in a vault account.
+  Initiates activation for a wallet in a vault account. Activation is required for tokens that need an on-chain transaction for creation (XLM tokens, SOL tokens etc).
+  **Endpoint Permission**: Admin, Non-Signing Admin, Signer, Approver, Editor.
+
+  ```
+    FireblocksSdk.Api.Vault.activate([
+      vaultAccountId: "1",
+      assetId: "XLM"
+    ])
+  ```
+
+  Options:\n#{NimbleOptions.docs(@activate_schema)}
   """
-  def activate(vault_id, asset_id, idempotentKey \\ "") do
-    post!("#{@accounts_path}/#{vault_id}/#{asset_id}/activate", "", idempotentKey)
+  def activate(opts, idempotentKey \\ "") do
+    {:ok, options} = NimbleOptions.validate(opts, @activate_schema)
+    vault_id = options[:vaultAccountId]
+    asset_id = options[:vaultAccountId]
+
+    params =
+      options
+      |> Keyword.delete(:vaultAccountId)
+      |> Keyword.delete(:assetId)
+      |> Enum.into(%{})
+      |> Jason.encode!()
+
+    post!("#{@accounts_path}/#{vault_id}/#{asset_id}/activate", params, idempotentKey)
   end
 
   @set_customer_ref_id_schema [
@@ -600,4 +634,10 @@ defmodule FireblocksSdk.Api.Vault do
   def get_vault_balance_by_asset(asset_id) when is_binary(asset_id) do
     get!("#{@base_path}/assets/#{asset_id}")
   end
+
+  @doc """
+  Look up a vault account by blockchain address
+  """
+  def lookup_by_address(address),
+    do: get!("#{@base_path}/lookup_by_address?address=#{address}")
 end
