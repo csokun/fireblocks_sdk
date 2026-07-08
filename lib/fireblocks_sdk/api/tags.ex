@@ -43,7 +43,7 @@ defmodule FireblocksSdk.Api.Tags do
 
   Options:\n#{NimbleOptions.docs(@list_tags_schema)}
   """
-  def list_tags(opts \\ []) do
+  def list(opts \\ []) do
     {:ok, params} = NimbleOptions.validate(opts, @list_tags_schema)
 
     query_string = URI.encode_query(params)
@@ -76,7 +76,7 @@ defmodule FireblocksSdk.Api.Tags do
 
   Options:\n#{NimbleOptions.docs(@create_tag_schema)}
   """
-  def create_tag(params) do
+  def create(params) do
     {:ok, options} = NimbleOptions.validate(params, @create_tag_schema)
     body = options |> Enum.into(%{}) |> Jason.encode!()
     post!(@base_path, body)
@@ -87,7 +87,7 @@ defmodule FireblocksSdk.Api.Tags do
 
   - `tag_id`: UUID of the tag to retrieve
   """
-  def get_tag(tag_id) when is_binary(tag_id) do
+  def get(tag_id) when is_binary(tag_id) do
     get!("#{@base_path}/#{tag_id}")
   end
 
@@ -109,7 +109,7 @@ defmodule FireblocksSdk.Api.Tags do
 
   Options:\n#{NimbleOptions.docs(@update_tag_schema)}
   """
-  def update_tag(tag_id, params) when is_binary(tag_id) do
+  def update(tag_id, params) when is_binary(tag_id) do
     {:ok, options} = NimbleOptions.validate(params, @update_tag_schema)
     body = options |> Enum.into(%{}) |> Jason.encode!()
     patch!("#{@base_path}/#{tag_id}", body)
@@ -120,7 +120,7 @@ defmodule FireblocksSdk.Api.Tags do
 
   - `tag_id`: UUID of the tag to delete
   """
-  def delete_tag(tag_id) when is_binary(tag_id) do
+  def delete(tag_id) when is_binary(tag_id) do
     delete!("#{@base_path}/#{tag_id}")
   end
 
