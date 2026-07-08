@@ -28,7 +28,16 @@ defmodule FireblocksSdk.Api.Vault do
     name: [type: :string, required: true],
     hiddenOnUI: [type: :boolean, default: false],
     customerRefId: [type: :string],
-    autoFuel: [type: :boolean, default: true]
+    autoFuel: [type: :boolean, default: true],
+    autoAssign: [
+      type: :boolean,
+      default: false,
+      doc: """
+      Applicable only when the vault account type is **KEY_LINK**. For MPC, this parameter will be ignored.
+      If set to true and there are available keys, random keys will be assigned to the newly created vault account.
+      If set to true and there are no available keys to be assigned, it will return an error. If set to false, the vault account will be created without any keys.
+      """
+    ]
   ]
 
   @doc """
@@ -349,9 +358,7 @@ defmodule FireblocksSdk.Api.Vault do
 
     query_string =
       params
-      |> dbg()
       |> list_to_string([:includeTagIds, :excludeTagIds])
-      |> dbg()
       |> atom_to_upper([:orderBy])
       |> URI.encode_query()
 
@@ -653,4 +660,32 @@ defmodule FireblocksSdk.Api.Vault do
   """
   def lookup_by_address(address),
     do: get!("#{@base_path}/lookup_by_address?address=#{address}")
+
+  @doc """
+  Get the USDC gateway address
+
+  Returns the USDC Gateway wallet information associated with the given vault account.
+
+  **Note**: This endpoint is currently in beta and might be subject to changes.
+  """
+  def get_usdc_gateway(vault_id),
+    do: get!("#{@accounts_path}/#{vault_id}/usdc_gateway")
+
+  @doc """
+  Activates the USDC Gateway wallet associated with the given vault account. If the wallet does not yet exist it is created in an activated state.
+
+  **Note**: This endpoint is currently in beta and might be subject to changes.
+  **Endpoint Permission**: Admin, Non-Signing Admin, Signer, Approver.
+  """
+  def activate_usdc_gateway(vault_id, idempotentKey \\ ""),
+    do: post!("#{@accounts_path}/#{vault_id}/usdc_gateway/activate", "", idempotentKey)
+
+  @doc """
+  Deactivates the USDC Gateway wallet associated with the given vault account.
+
+  **Note**: This endpoint is currently in beta and might be subject to changes.
+  **Endpoint Permission**: Admin, Non-Signing Admin, Signer, Approver.
+  """
+  def deactivate_usdc_gateway(vault_id, idempotentKey \\ ""),
+    do: post!("#{@accounts_path}/#{vault_id}/usdc_gateway/deactivate", "", idempotentKey)
 end
