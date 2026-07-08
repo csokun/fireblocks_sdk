@@ -317,6 +317,16 @@ defmodule FireblocksSdk.Api.Vault do
                  namePrefix: [type: :string],
                  nameSuffix: [type: :string],
                  minAmountThreshold: [type: :non_neg_integer],
+                 includeTagIds: [
+                   type: {:list, :string},
+                   default: [],
+                   doc: "list of tag IDs to include"
+                 ],
+                 excludeTagIds: [
+                   type: {:list, :string},
+                   default: [],
+                   doc: "list of tag IDs to exclude"
+                 ],
                  assetId: [type: :string],
                  orderBy: [type: {:in, [:asc, :desc]}, doc: "order by `:asc` or `:desc`"]
                ] ++ @pagination
@@ -339,6 +349,9 @@ defmodule FireblocksSdk.Api.Vault do
 
     query_string =
       params
+      |> dbg()
+      |> list_to_string([:includeTagIds, :excludeTagIds])
+      |> dbg()
       |> atom_to_upper([:orderBy])
       |> URI.encode_query()
 

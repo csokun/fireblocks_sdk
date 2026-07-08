@@ -45,10 +45,25 @@ defmodule FireblocksSdk.Request do
     data
   end
 
+  def list_to_string(params, props) do
+    Enum.reduce(props, params, fn path, acc ->
+      # Allows passing either :key or [:key]
+      path = List.wrap(path)
+
+      case get_in(acc, path) do
+        # if the value is an empty list, pop it and return the new acc
+        [] -> elem(pop_in(acc, path), 1)
+        # Only join if the value is actually a list
+        list when is_list(list) -> put_in(acc, path, Enum.join(list, ","))
+        _ -> acc
+      end
+    end)
+  end
+
   @doc """
   Convert atom to uppercase string.
   ```
-    FireblocksSdk.Request.atom_to_upper([feeLevel: medium]) 
+    FireblocksSdk.Request.atom_to_upper([feeLevel: medium])
     # [feeLevel: "MEDIUM"]
   ```
   """
