@@ -99,7 +99,7 @@ defmodule FireblocksSdk.Request do
 
   defp headers(token) do
     api_key = Application.get_env(:fireblocks_sdk, :apiKey)
-    agent = "fireblocks-sdk-elixir/#{FireblocksSdk.MixProject.getVersion()}"
+    agent = "fireblocks-sdk-elixir/#{Mix.Project.config()[:version]}"
 
     [
       {"X-API-Key", api_key},
