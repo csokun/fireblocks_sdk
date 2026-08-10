@@ -3,8 +3,8 @@ defmodule FireblocksSdk.Signer do
   use Joken.Config
 
   def sign_jwt(path, body \\ %{}) do
-    apiKey = Application.get_env(:fireblocks_sdk, :apiKey)
-    apiSecret = Application.get_env(:fireblocks_sdk, :apiSecret)
+    apiKey = Application.fetch_env!(:fireblocks_sdk, :apiKey)
+    apiSecret = Application.fetch_env!(:fireblocks_sdk, :apiSecret)
 
     # support base64 secret
     secret =
