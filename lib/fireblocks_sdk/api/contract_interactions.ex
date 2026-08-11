@@ -24,7 +24,7 @@ defmodule FireblocksSdk.Api.ContractInteractions do
   @read_schema [
     baseAssetId: [type: :string, required: true, doc: "Base assetId e.g ETH, ETH_TEST5"],
     contractAddress: [type: :string, required: true],
-    abiFunction: [type: :map]
+    abiFunction: [type: :map, required: true]
   ]
 
   @doc """
@@ -54,12 +54,12 @@ defmodule FireblocksSdk.Api.ContractInteractions do
   @write_schema [
     baseAssetId: [type: :string, required: true, doc: "Base assetId e.g ETH, ETH_TEST5"],
     contractAddress: [type: :string, required: true],
-    vaultId: [
+    vaultAccountId: [
       type: :string,
       required: true,
       doc: "The vault account id this contract was deploy from"
     ],
-    abiFunction: [type: :map],
+    abiFunction: [type: :map, required: true],
     amount: [type: :string, doc: "Amount in base asset. Being used in payable functions"],
     feeLevel: [
       type: {:in, [:low, :medium, :high]},
