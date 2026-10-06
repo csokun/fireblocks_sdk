@@ -44,7 +44,7 @@ defmodule FireblocksSdk.Api.Staking do
     txNote: [type: :string, required: false]
   ]
 
-  @claim_reawards_schema [
+  @claim_rewards_schema [
     id: [type: :string, required: true, doc: "id of position to claim rewards from"],
     chainDescriptor: [type: :string, required: true],
     fee: [type: :string],
@@ -266,7 +266,7 @@ defmodule FireblocksSdk.Api.Staking do
   Execute a Claim Rewards operation.
 
   ```
-  FireblocksSdk.Api.Staking.claim_reawards([
+  FireblocksSdk.Api.Staking.claim_rewards([
     id: "b70701f4-d7b1-4795-a8ee-b09cdb5b850d",
     chainDescriptor: "SOL",
     txNote: "claim rewards request id b70701f4-d7b1-4795-a8ee-b09cdb5b850d",
@@ -274,10 +274,10 @@ defmodule FireblocksSdk.Api.Staking do
   ])
   ```
 
-  Options:\n#{NimbleOptions.docs(@claim_reawards_schema)}
+  Options:\n#{NimbleOptions.docs(@claim_rewards_schema)}
   """
-  def claim_reawards(claim_request, idempotentKey \\ "") do
-    {:ok, options} = NimbleOptions.validate(claim_request, @claim_reawards_schema)
+  def claim_rewards(claim_request, idempotentKey \\ "") do
+    {:ok, options} = NimbleOptions.validate(claim_request, @claim_rewards_schema)
 
     chain_descriptor = options[:chainDescriptor]
 
@@ -292,6 +292,11 @@ defmodule FireblocksSdk.Api.Staking do
       params,
       idempotentKey
     )
+  end
+
+  @deprecated "Use claim_rewards/2 instead"
+  def claim_reawards(claim_request, idempotentKey \\ "") do
+    claim_rewards(claim_request, idempotentKey)
   end
 
   @doc """
